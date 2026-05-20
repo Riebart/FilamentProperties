@@ -188,6 +188,7 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
 
 <div class="tabs">
   <button class="tab-btn active" data-tab="chemical-resistance">Chemical resistance</button>
+  <button class="tab-btn" data-tab="lubricants">Lubricants</button>
   <button class="tab-btn" data-tab="adhesives">Adhesives</button>
 </div>
 
@@ -263,6 +264,66 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
   </div>
 </div>
 </div><!-- /tab-panel chemical-resistance -->
+
+<div class="tab-panel" id="tab-lubricants">
+  <div class="controls" id="lub-controls">
+    <div class="ctrl-pill">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="lubSearchInput" placeholder="Search lubricant…" autocomplete="off">
+    </div>
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-pill">
+      <label><input type="checkbox" id="lubFilterCD"> Show only C / D rows</label>
+    </div>
+    <div class="ctrl-pill">
+      <label><input type="checkbox" id="lubFilterBest"> Best-material highlight</label>
+    </div>
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-pill">
+      <span style="margin-right:.15rem">Cols:</span>
+      <div class="mat-btns">
+        <button id="lubShowAllBtn">All</button>
+        <span id="lubMatToggleRow"></span>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><span class="leg-chip leg-A">A</span> Resists very well (&lt;1%)</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-B">B</span> Moderate (2–3%)</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-C">C</span> Resists poorly (4–5%)</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-D">D</span> Fails (&gt;5% / destroyed)</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-none">–</span> No data</div>
+  </div>
+  <div class="card"><div class="scroll">
+    <table id="lubTable">
+      <thead><tr id="lubHeaderRow"><th>Lubricant</th></tr></thead>
+      <tbody id="lubTbody"></tbody>
+    </table>
+  </div></div>
+  <div class="panels">
+    <div class="panel">
+      <h3>Rating Scale (A–D)</h3>
+      <dl>
+        <dt class="dtA">A</dt><dd>Resists very well. &lt;1% change in weight or dimensions.</dd>
+        <dt class="dtB">B</dt><dd>Moderate resistance. 2–3% change; slight swelling or weight gain.</dd>
+        <dt class="dtC">C</dt><dd>Resists poorly. 4–5% change; significant swelling with prolonged exposure.</dd>
+        <dt class="dtD">D</dt><dd>Does not resist. &gt;5% change or complete destruction.</dd>
+      </dl>
+      <div class="conf-legend">
+        <div class="conf-item"><span style="font-family:'IBM Plex Mono',monospace;font-size:.8rem">†</span> measured / TDS</div>
+        <div class="conf-item"><span style="font-family:'IBM Plex Mono',monospace;font-size:.8rem">‡</span> interpolated / inferred</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Sources</h3>
+      <ul id="lubRefList"></ul>
+    </div>
+  </div>
+</div><!-- /tab-panel lubricants -->
 
 <div class="tab-panel" id="tab-adhesives">
   <div class="tab-empty">
@@ -425,14 +486,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
         "flux_remover": {
           "rating": "D",
           "confidence": "tds",
@@ -453,14 +506,6 @@ const DATA = {
           "rating": "C",
           "confidence": "inferred",
           "tip": "Aliphatic and aromatic hydrocarbons in gasoline swell and soften ABS. Not suitable for fuel-contact applications.",
-          "references": [
-            "graco_compat"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
           "references": [
             "graco_compat"
           ]
@@ -511,6 +556,24 @@ const DATA = {
           "tip": "Chloroform fully dissolves ABS. Complete structural failure.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
           ]
         }
       }
@@ -649,14 +712,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
         "flux_remover": {
           "rating": "C",
           "confidence": "tds",
@@ -676,14 +731,6 @@ const DATA = {
         "gasoline": {
           "rating": "B",
           "confidence": "inferred",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
-          "confidence": "tds",
           "tip": null,
           "references": [
             "graco_compat"
@@ -735,6 +782,24 @@ const DATA = {
           "tip": "Chloroform dissolves ASA's styrene phase completely. Full structural failure.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
           ]
         }
       }
@@ -874,14 +939,6 @@ const DATA = {
             "simplify3d_guide"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "inferred",
-          "tip": null,
-          "references": [
-            "general_chem"
-          ]
-        },
         "flux_remover": {
           "rating": "D",
           "confidence": "tds",
@@ -905,14 +962,6 @@ const DATA = {
           "tip": "Significant swelling and surface attack. Aromatic fractions in gasoline dissolve HIPS's styrene phase.",
           "references": [
             "general_chem"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "kmac_hips"
           ]
         },
         "naoh_10": {
@@ -961,6 +1010,24 @@ const DATA = {
           "tip": "Chloroform dissolves HIPS as a styrene-based polymer.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
           ]
         }
       }
@@ -1099,14 +1166,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
         "flux_remover": {
           "rating": "B",
           "confidence": "tds",
@@ -1124,14 +1183,6 @@ const DATA = {
           ]
         },
         "gasoline": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
-        "motor_oil": {
           "rating": "A",
           "confidence": "tds",
           "tip": null,
@@ -1185,6 +1236,24 @@ const DATA = {
           "tip": "Nylons show partial resistance to chlorinated solvents; measurable swelling but not full dissolution.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
           ]
         }
       }
@@ -1325,14 +1394,6 @@ const DATA = {
             "smithmetal_pa12"
           ]
         },
-        "wd40": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "smithmetal_pa12"
-          ]
-        },
         "flux_remover": {
           "rating": "B",
           "confidence": "inferred",
@@ -1350,14 +1411,6 @@ const DATA = {
           ]
         },
         "gasoline": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "smithmetal_pa12"
-          ]
-        },
-        "motor_oil": {
           "rating": "A",
           "confidence": "tds",
           "tip": null,
@@ -1411,6 +1464,24 @@ const DATA = {
           "tip": "PA12 shows partial resistance; chloroform causes surface softening and swelling.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
           ]
         }
       }
@@ -1549,14 +1620,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
         "flux_remover": {
           "rating": "C",
           "confidence": "tds",
@@ -1575,14 +1638,6 @@ const DATA = {
         },
         "gasoline": {
           "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
           "confidence": "tds",
           "tip": null,
           "references": [
@@ -1635,6 +1690,24 @@ const DATA = {
           "tip": "Chloroform fully dissolves polycarbonate. Complete structural failure.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
           ]
         }
       }
@@ -1773,14 +1846,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "kmac_petg"
-          ]
-        },
         "flux_remover": {
           "rating": "B",
           "confidence": "tds",
@@ -1800,14 +1865,6 @@ const DATA = {
         },
         "gasoline": {
           "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "kmac_petg"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
           "confidence": "tds",
           "tip": null,
           "references": [
@@ -1860,6 +1917,24 @@ const DATA = {
           "tip": "Chloroform dissolves PETG. Complete structural failure.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_petg"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_petg"
           ]
         }
       }
@@ -1998,14 +2073,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
         "flux_remover": {
           "rating": "C",
           "confidence": "tds",
@@ -2027,14 +2094,6 @@ const DATA = {
           "rating": "C",
           "confidence": "inferred",
           "tip": "Significant swelling and surface crazing. Gasoline penetrates PLA causing dimensional instability; not suitable for fuel contact.",
-          "references": [
-            "graco_compat"
-          ]
-        },
-        "motor_oil": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
           "references": [
             "graco_compat"
           ]
@@ -2085,6 +2144,24 @@ const DATA = {
           "tip": "Chloroform fully dissolves PLA. Prusa Knowledge Base confirms chloroform as a PLA solvent — lab use only, toxic and suspected carcinogen.",
           "references": [
             "prusa_kb_pla"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
           ]
         }
       }
@@ -2227,14 +2304,6 @@ const DATA = {
             "kmac_pom"
           ]
         },
-        "wd40": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "kmac_pom"
-          ]
-        },
         "flux_remover": {
           "rating": "A",
           "confidence": "inferred",
@@ -2253,14 +2322,6 @@ const DATA = {
           ]
         },
         "gasoline": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "kmac_pom"
-          ]
-        },
-        "motor_oil": {
           "rating": "A",
           "confidence": "tds",
           "tip": null,
@@ -2315,6 +2376,24 @@ const DATA = {
           "tip": null,
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
           ]
         }
       }
@@ -2453,14 +2532,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
         "flux_remover": {
           "rating": "A",
           "confidence": "tds",
@@ -2478,14 +2549,6 @@ const DATA = {
           ]
         },
         "gasoline": {
-          "rating": "A",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "graco_compat"
-          ]
-        },
-        "motor_oil": {
           "rating": "A",
           "confidence": "tds",
           "tip": null,
@@ -2539,6 +2602,24 @@ const DATA = {
           "tip": null,
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
           ]
         }
       }
@@ -2637,14 +2718,6 @@ const DATA = {
             "prusament_2021"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "inferred",
-          "tip": null,
-          "references": [
-            "general_chem"
-          ]
-        },
         "flux_remover": {
           "rating": "D",
           "confidence": "tds",
@@ -2665,14 +2738,6 @@ const DATA = {
           "rating": "C",
           "confidence": "inferred",
           "tip": "Moderate to severe attack from aromatic hydrocarbon content in gasoline. PVB swells significantly.",
-          "references": [
-            "general_chem"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
-          "confidence": "inferred",
-          "tip": null,
           "references": [
             "general_chem"
           ]
@@ -2721,6 +2786,24 @@ const DATA = {
           "rating": "D",
           "confidence": "inferred",
           "tip": "PVB dissolves readily in chlorinated solvents. Complete structural failure.",
+          "references": [
+            "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
           "references": [
             "general_chem"
           ]
@@ -2863,14 +2946,6 @@ const DATA = {
             "forerunner_tpu_2025"
           ]
         },
-        "wd40": {
-          "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "basf_elastollan"
-          ]
-        },
         "flux_remover": {
           "rating": "C",
           "confidence": "tds",
@@ -2890,14 +2965,6 @@ const DATA = {
         },
         "gasoline": {
           "rating": "B",
-          "confidence": "tds",
-          "tip": null,
-          "references": [
-            "basf_elastollan"
-          ]
-        },
-        "motor_oil": {
-          "rating": "A",
           "confidence": "tds",
           "tip": null,
           "references": [
@@ -2950,6 +3017,24 @@ const DATA = {
           "tip": "Chloroform causes significant swelling and softening of TPU soft segments.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "lubricants": {
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
           ]
         }
       }
@@ -3095,16 +3180,6 @@ const DATA = {
       ],
       "notes": "Pure acetone. Common solvent; intentionally used to smooth ABS."
     },
-    "wd40": {
-      "name": "WD-40 / Mineral oil",
-      "aka": [
-        "WD-40",
-        "Petroleum distillates",
-        "Mineral spirits",
-        "White spirit"
-      ],
-      "notes": "Petroleum distillate-based lubricant/displacing fluid. Representative of light mineral oil and penetrating oils."
-    },
     "flux_remover": {
       "name": "Flux remover",
       "aka": [
@@ -3131,15 +3206,6 @@ const DATA = {
         "Aliphatic hydrocarbons"
       ],
       "notes": "Regular unleaded gasoline. Contains aliphatic and aromatic hydrocarbons including benzene, toluene, and xylene fractions."
-    },
-    "motor_oil": {
-      "name": "Motor oil",
-      "aka": [
-        "Engine oil",
-        "Mineral oil",
-        "Lubricating oil"
-      ],
-      "notes": "Conventional mineral-base motor oil (SAE 5W-30 / 10W-40 type). Synthetic variants may vary."
     },
     "naoh_10": {
       "name": "NaOH lye 10%",
@@ -3332,7 +3398,29 @@ const DATA = {
       "url": "https://help.prusa3d.com/article/pla_2062",
       "notes": "Confirms chloroform, hot benzene, and THF as PLA solvents under lab conditions."
     }
-  }
+  },
+  "lubricants": {
+    "wd40": {
+      "name": "WD-40 / Mineral oil",
+      "aka": [
+        "WD-40",
+        "Petroleum distillates",
+        "Mineral spirits",
+        "White spirit"
+      ],
+      "notes": "Petroleum distillate-based lubricant/displacing fluid. Representative of light mineral oil and penetrating oils."
+    },
+    "motor_oil": {
+      "name": "Motor oil",
+      "aka": [
+        "Engine oil",
+        "Mineral oil",
+        "Lubricating oil"
+      ],
+      "notes": "Conventional mineral-base motor oil (SAE 5W-30 / 10W-40 type). Synthetic variants may vary."
+    }
+  },
+  "adhesives": {}
 };
 
 // ── Derived display order (alphabetical by material name) ─────────────────
@@ -3714,4 +3802,169 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + target));
   });
 });
+
+// ── Lubricants tab ────────────────────────────────────────────────────────
+(function(){
+  const LUB_KEYS = Object.keys(DATA.lubricants);
+  const lubHiddenCols = new Set();
+  let lubSortedKeys = [...LUB_KEYS];
+  let lubCurrentSort = null;
+
+  // Header
+  const lubHeaderRow = document.getElementById('lubHeaderRow');
+  MAT_KEYS.forEach((mk, ci) => {
+    const th = document.createElement('th');
+    th.dataset.ci = 'l'+ci;
+    th.innerHTML = DATA.materials[mk]._meta.name + ' <span class="si"></span>';
+    th.addEventListener('click', () => lubSortByCol(ci));
+    lubHeaderRow.appendChild(th);
+  });
+
+  // Reference list — only refs actually used in lubricants data
+  const lubRefSlugs = new Set();
+  Object.values(DATA.materials).forEach(mat => {
+    Object.values(mat.lubricants || {}).forEach(entry => {
+      (entry.references || []).forEach(r => lubRefSlugs.add(r));
+    });
+  });
+  const lubRefList = document.getElementById('lubRefList');
+  Object.entries(DATA.references).forEach(([slug, ref]) => {
+    if (!lubRefSlugs.has(slug)) return;
+    const li = document.createElement('li');
+    li.id = 'lubref-' + slug;
+    const num = REF_INDEX[slug];
+    const link = ref.url ? `<a href="${ref.url}" target="_blank" rel="noopener">${esc(ref.title)}</a>` : esc(ref.title);
+    const year = ref.year ? ` (${ref.year})` : '';
+    const authors = ref.authors ? ` — ${esc(ref.authors)}` : '';
+    li.innerHTML = `<span class="ref-num">[${num}]</span>` + link + year + authors;
+    lubRefList.appendChild(li);
+  });
+
+  // Column toggles
+  const lubMatToggleRow = document.getElementById('lubMatToggleRow');
+  MAT_KEYS.forEach((mk, ci) => {
+    const btn = document.createElement('button');
+    btn.textContent = DATA.materials[mk]._meta.name;
+    btn.dataset.ci = 'l'+ci;
+    btn.addEventListener('click', () => {
+      if (lubHiddenCols.has(ci)) { lubHiddenCols.delete(ci); btn.classList.remove('hidden-col'); }
+      else { lubHiddenCols.add(ci); btn.classList.add('hidden-col'); }
+      document.querySelectorAll(`#lubTable [data-ci="l${ci}"]`).forEach(el => el.classList.toggle('col-hidden', lubHiddenCols.has(ci)));
+    });
+    lubMatToggleRow.appendChild(btn);
+  });
+  document.getElementById('lubShowAllBtn').addEventListener('click', () => {
+    lubHiddenCols.clear();
+    lubMatToggleRow.querySelectorAll('button').forEach(b => b.classList.remove('hidden-col'));
+    document.querySelectorAll('#lubTable .col-hidden').forEach(el => el.classList.remove('col-hidden'));
+  });
+
+  const lubTbody = document.getElementById('lubTbody');
+
+  function getLubRating(matKey, lubKey){
+    return DATA.materials[matKey]?.lubricants?.[lubKey] || null;
+  }
+
+  function buildLubRows(order) {
+    lubTbody.innerHTML = '';
+    order.forEach(lk => {
+      const lub = DATA.lubricants[lk];
+      if (!lub) return;
+      const tr = document.createElement('tr');
+      tr.dataset.lk = lk;
+      const td0 = document.createElement('td');
+      td0.className = 'chem-cell';
+      const aka = (lub.aka || []).join(', ');
+      td0.innerHTML = esc(lub.name) + (aka ? `<span class="fml">${esc(aka)}</span>` : '');
+      if (lub.notes) td0.title = lub.notes;
+      tr.appendChild(td0);
+
+      MAT_KEYS.forEach((mk, ci) => {
+        const entry = getLubRating(mk, lk);
+        const rating = entry?.rating || null;
+        const td = document.createElement('td');
+        td.className = 'r ' + chipClass(rating);
+        td.dataset.ci = 'l'+ci;
+        if (entry?.confidence) td.dataset.conf = entry.confidence;
+        if (lubHiddenCols.has(ci)) td.classList.add('col-hidden');
+        const hasTip = (rating === 'C' || rating === 'D') && entry?.tip;
+        if (hasTip) {
+          td.classList.add('has-tip'); td.tabIndex = 0; td.setAttribute('role','button');
+          const open = e => {
+            e.stopPropagation();
+            if (activeCell === td) { hideTip(); return; }
+            hideTip(); activeCell = td; td.classList.add('active');
+            const rect = td.getBoundingClientRect();
+            showTip(lub.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2);
+          };
+          td.addEventListener('click', open);
+          td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(e); }});
+          td.addEventListener('mouseleave', () => { if(activeCell===td) scheduledHide(); });
+        }
+        const conf = entry?.confidence || null;
+        const dagger = (conf==='measured'||conf==='tds') ? '†' : (conf==='interpolated'||conf==='inferred') ? '‡' : '';
+        const markHtml = dagger ? `<span class="conf-mark">${dagger}</span>` : '';
+        td.innerHTML = `<span class="chip">${chipLabel(rating)}${markHtml}</span>`;
+        tr.appendChild(td);
+      });
+      lubTbody.appendChild(tr);
+    });
+    lubApplyFilters();
+    if (document.getElementById('lubFilterBest').checked) lubMarkBest();
+  }
+
+  buildLubRows(lubSortedKeys);
+
+  function lubApplyFilters() {
+    const cdOnly = document.getElementById('lubFilterCD').checked;
+    const q = document.getElementById('lubSearchInput').value.trim().toLowerCase();
+    lubTbody.querySelectorAll('tr').forEach(tr => {
+      const lk = tr.dataset.lk;
+      const lub = DATA.lubricants[lk];
+      const name = (lub?.name||'').toLowerCase();
+      const aka  = (lub?.aka||[]).join(' ').toLowerCase();
+      const matchQ = !q || name.includes(q) || aka.includes(q);
+      if (!matchQ) { tr.classList.add('row-hidden'); tr.classList.remove('hl'); return; }
+      if (cdOnly) {
+        const hasCD = MAT_KEYS.some(mk => { const r = getLubRating(mk,lk)?.rating; return r==='C'||r==='D'; });
+        tr.classList.toggle('row-hidden', !hasCD);
+      } else { tr.classList.remove('row-hidden'); }
+      tr.classList.toggle('hl', !!q);
+    });
+  }
+  document.getElementById('lubFilterCD').addEventListener('change', lubApplyFilters);
+  document.getElementById('lubSearchInput').addEventListener('input', lubApplyFilters);
+  document.getElementById('lubFilterBest').addEventListener('change', () => {
+    document.getElementById('lubFilterBest').checked ? lubMarkBest() : lubClearBest();
+  });
+
+  function lubMarkBest() {
+    lubClearBest();
+    lubTbody.querySelectorAll('tr:not(.row-hidden)').forEach(tr => {
+      const cells = Array.from(tr.querySelectorAll('td.r:not(.col-hidden)'));
+      let best=null, bestRank=99;
+      cells.forEach(td => { const v=td.querySelector('.chip')?.textContent.trim(); const rank=RATING_ORD[v]??99; if(rank<bestRank){bestRank=rank;best=td;} });
+      if(best) best.classList.add('best-col');
+    });
+  }
+  function lubClearBest() { lubTbody.querySelectorAll('.best-col').forEach(td=>td.classList.remove('best-col')); }
+
+  function lubSortByCol(ci) {
+    const ths = Array.from(lubHeaderRow.querySelectorAll('th'));
+    ths.forEach(th => th.classList.remove('sort-asc','sort-desc'));
+    const mk = MAT_KEYS[ci];
+    if (lubCurrentSort?.ci===ci && lubCurrentSort.dir==='asc') {
+      lubCurrentSort={ci,dir:'desc'}; ths[ci+1].classList.add('sort-desc');
+    } else {
+      lubCurrentSort={ci,dir:'asc'}; ths[ci+1].classList.add('sort-asc');
+    }
+    lubSortedKeys = [...LUB_KEYS].sort((a,b) => {
+      const ar = RATING_ORD[getLubRating(mk,a)?.rating]??99;
+      const br = RATING_ORD[getLubRating(mk,b)?.rating]??99;
+      return lubCurrentSort.dir==='asc' ? ar-br : br-ar;
+    });
+    buildLubRows(lubSortedKeys);
+  }
+})();
+
 </script>
