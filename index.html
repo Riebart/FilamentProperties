@@ -3,21 +3,22 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FDM Filament Chemical Resistance Chart</title>
+<title>FDM Filament Chemical Resistance</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
+/* ── TOKENS ──────────────────────────────────────────────────────────────── */
 :root,[data-theme="light"]{
-  --bg:#f5f4f0;--surface:#ffffff;--surface2:#f7f7f4;--border:#d8d5cf;--divider:#ece9e3;
+  --bg:#f5f4f0;--surface:#fff;--surface2:#f7f7f4;--border:#d8d5cf;--divider:#ece9e3;
   --text:#1a1916;--muted:#6b6a66;--faint:#b0aea8;
   --A-bg:#cff2dc;--A-fg:#0c4421;
   --B-bg:#e6f0c8;--B-fg:#384e0c;
   --C-bg:#fde8bb;--C-fg:#7a4000;
   --D-bg:#fdd4d0;--D-fg:#7a120d;
   --none-bg:#edeae4;--none-fg:#aeaba4;
-  --tooltip-bg:#1a1916;--tooltip-text:#f0ede8;
-  --shadow:0 8px 40px rgba(0,0,0,0.10),0 2px 8px rgba(0,0,0,0.06);
+  --tip-bg:#1a1916;--tip-text:#f0ede8;
+  --shadow:0 8px 40px rgba(0,0,0,.10),0 2px 8px rgba(0,0,0,.06);
   --r:14px;
 }
 [data-theme="dark"]{
@@ -28,115 +29,124 @@
   --C-bg:#362612;--C-fg:#edaa58;
   --D-bg:#361615;--D-fg:#f08278;
   --none-bg:#202018;--none-fg:#46443e;
-  --tooltip-bg:#f0ede8;--tooltip-text:#1a1916;
-  --shadow:0 8px 40px rgba(0,0,0,0.45),0 2px 8px rgba(0,0,0,0.30);
+  --tip-bg:#f0ede8;--tip-text:#1a1916;
+  --shadow:0 8px 40px rgba(0,0,0,.45),0 2px 8px rgba(0,0,0,.30);
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-font-smoothing:antialiased}
-body{min-height:100dvh;font-family:'Inter',system-ui,sans-serif;font-size:clamp(0.875rem,0.82rem+0.28vw,1rem);color:var(--text);background:var(--bg);padding:clamp(0.75rem,2.5vw,2rem)}
+body{min-height:100dvh;font-family:'Inter',system-ui,sans-serif;font-size:clamp(.875rem,.82rem+.28vw,1rem);color:var(--text);background:var(--bg);padding:clamp(.75rem,2.5vw,2rem)}
 
-/* HEADER */
-.hdr{max-width:1400px;margin:0 auto clamp(0.75rem,2vw,1.5rem);display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;flex-wrap:wrap}
-.hdr-title{font-size:clamp(1rem,0.85rem+0.8vw,1.45rem);font-weight:700;letter-spacing:-0.025em;line-height:1.2}
-.hdr-sub{font-size:clamp(0.68rem,0.63rem+0.22vw,0.78rem);color:var(--muted);margin-top:0.25rem;max-width:70ch;line-height:1.5}
-.btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;flex-shrink:0}
-.tbtn{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.72rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:0.35rem;transition:background 150ms;white-space:nowrap}
+/* ── HEADER ──────────────────────────────────────────────────────────────── */
+.hdr{max-width:1400px;margin:0 auto clamp(.75rem,2vw,1.5rem);display:flex;align-items:flex-start;justify-content:space-between;gap:.75rem;flex-wrap:wrap}
+.hdr-title{font-size:clamp(1rem,.85rem+.8vw,1.45rem);font-weight:700;letter-spacing:-.025em;line-height:1.2}
+.hdr-sub{font-size:clamp(.68rem,.63rem+.22vw,.78rem);color:var(--muted);margin-top:.25rem;max-width:72ch;line-height:1.5}
+.btn-row{display:flex;gap:.45rem;flex-wrap:wrap;align-items:center;flex-shrink:0}
+.tbtn{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:.33rem .75rem;font-size:.71rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:.32rem;transition:background 120ms;white-space:nowrap;font-family:inherit}
 .tbtn:hover{background:var(--surface2)}
 
-/* CONTROLS */
-.controls{max-width:1400px;margin:0 auto 0.9rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center}
-.filter-group{display:flex;align-items:center;gap:0.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.72rem;color:var(--muted)}
-.filter-group label{cursor:pointer;display:flex;align-items:center;gap:0.3rem}
-.filter-group input[type=checkbox]{accent-color:var(--D-fg);width:13px;height:13px}
-.search-wrap{display:flex;align-items:center;gap:0.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.72rem}
-.search-wrap input{background:none;border:none;outline:none;font-size:0.72rem;color:var(--text);width:120px;font-family:inherit}
-.search-wrap input::placeholder{color:var(--faint)}
-.mat-toggle-wrap{display:flex;align-items:center;gap:0.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.72rem;color:var(--muted)}
-.mat-toggle-wrap button{background:none;border:none;font-size:0.7rem;color:var(--muted);cursor:pointer;padding:0 0.25rem;border-radius:3px}
-.mat-toggle-wrap button:hover{background:var(--surface2)}
-.ctrl-sep{width:1px;height:1.2rem;background:var(--divider)}
+/* ── CONTROLS ────────────────────────────────────────────────────────────── */
+.controls{max-width:1400px;margin:0 auto .85rem;display:flex;flex-wrap:wrap;gap:.45rem;align-items:center}
+.ctrl-pill{display:flex;align-items:center;gap:.38rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:.28rem .65rem;font-size:.71rem;color:var(--muted)}
+.ctrl-pill label{cursor:pointer;display:flex;align-items:center;gap:.28rem}
+.ctrl-pill input[type=checkbox]{accent-color:var(--D-fg);width:12px;height:12px}
+.ctrl-pill input[type=text]{background:none;border:none;outline:none;font-size:.71rem;color:var(--text);width:130px;font-family:inherit}
+.ctrl-pill input[type=text]::placeholder{color:var(--faint)}
+.ctrl-sep{width:1px;height:1.1rem;background:var(--divider)}
+.mat-btns{display:flex;gap:.2rem;align-items:center;flex-wrap:wrap}
+.mat-btns button{background:none;border:none;font-size:.67rem;color:var(--muted);cursor:pointer;padding:.1rem .28rem;border-radius:3px;font-family:inherit}
+.mat-btns button:hover{background:var(--surface2)}
+.mat-btns button.hidden-col{opacity:.38;text-decoration:line-through}
 
-/* LEGEND */
-.legend{max-width:1400px;margin:0 auto 0.9rem;display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center}
-.leg-item{display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--muted)}
-.leg-chip{display:inline-flex;align-items:center;justify-content:center;min-width:1.7rem;height:1.35rem;padding:0 0.3rem;border-radius:4px;font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:0.7rem}
-.leg-A{background:var(--A-bg);color:var(--A-fg)}
-.leg-B{background:var(--B-bg);color:var(--B-fg)}
-.leg-C{background:var(--C-bg);color:var(--C-fg)}
-.leg-D{background:var(--D-bg);color:var(--D-fg)}
+/* ── LEGEND ──────────────────────────────────────────────────────────────── */
+.legend{max-width:1400px;margin:0 auto .85rem;display:flex;flex-wrap:wrap;gap:.38rem;align-items:center}
+.leg-item{display:flex;align-items:center;gap:.28rem;font-size:.69rem;color:var(--muted)}
+.leg-chip{display:inline-flex;align-items:center;justify-content:center;min-width:1.65rem;height:1.3rem;padding:0 .28rem;border-radius:4px;font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:.69rem}
+.leg-A{background:var(--A-bg);color:var(--A-fg)} .leg-B{background:var(--B-bg);color:var(--B-fg)}
+.leg-C{background:var(--C-bg);color:var(--C-fg)} .leg-D{background:var(--D-bg);color:var(--D-fg)}
 .leg-none{background:var(--none-bg);color:var(--none-fg)}
-.leg-sep{width:1px;height:1rem;background:var(--divider);margin:0 0.15rem}
-.leg-hint{display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--muted)}
+.leg-sep{width:1px;height:.95rem;background:var(--divider);margin:0 .12rem}
 
-/* TABLE */
+/* ── CARD / TABLE ────────────────────────────────────────────────────────── */
 .card{max-width:1400px;margin:0 auto;background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border)}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{width:100%;border-collapse:collapse;min-width:600px}
-thead th{padding:0.55rem 0.35rem;text-align:center;font-size:0.63rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-bottom:2px solid var(--border);white-space:nowrap;background:var(--surface2);color:var(--muted);cursor:pointer;user-select:none;position:relative}
-thead th:first-child{text-align:left;padding-left:1rem;min-width:195px;font-size:0.75rem;text-transform:none;letter-spacing:0;font-weight:600;cursor:default}
-thead th:not(:first-child):hover{background:var(--divider)}
-thead th .sort-icon{opacity:0.35;margin-left:2px;font-size:0.6rem}
-thead th.sort-asc .sort-icon::after{content:'↑'}
-thead th.sort-desc .sort-icon::after{content:'↓'}
-thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'↕'}
-thead th.col-hidden{display:none}
+table{width:100%;border-collapse:collapse;min-width:560px}
 
-tbody tr{border-bottom:1px solid var(--divider);transition:background 120ms}
+thead th{padding:.52rem .32rem;text-align:center;font-size:.61rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-bottom:2px solid var(--border);white-space:nowrap;background:var(--surface2);color:var(--muted);cursor:pointer;user-select:none}
+thead th:first-child{text-align:left;padding-left:1rem;min-width:190px;font-size:.73rem;text-transform:none;letter-spacing:0;font-weight:600;cursor:default}
+thead th:not(:first-child):hover{background:var(--divider)}
+thead th .si{opacity:.3;margin-left:2px;font-size:.58rem}
+thead th.sort-asc .si::after{content:'↑'} thead th.sort-desc .si::after{content:'↓'}
+thead th:not(.sort-asc):not(.sort-desc) .si::after{content:'↕'}
+thead th.col-hidden,td.col-hidden{display:none}
+
+tbody tr{border-bottom:1px solid var(--divider);transition:background 100ms}
 tbody tr:last-child{border-bottom:none}
 tbody tr:hover{background:var(--surface2)}
 tbody tr.row-hidden{display:none}
-tbody tr.row-highlight td.chem{background:rgba(255,220,50,0.15)}
+tbody tr.hl td.chem-cell{background:rgba(255,215,40,.12)}
 
-td.chem{padding:0.45rem 0.5rem 0.45rem 1rem;font-size:0.8rem;font-weight:500;white-space:nowrap}
-td.chem .formula{display:block;font-family:'IBM Plex Mono',monospace;font-size:0.66rem;color:var(--faint);font-weight:400;margin-top:1px}
-td.chem.col-hidden{display:none}
+td.chem-cell{padding:.42rem .5rem .42rem 1rem;font-size:.79rem;font-weight:500;white-space:nowrap}
+td.chem-cell .fml{display:block;font-family:'IBM Plex Mono',monospace;font-size:.64rem;color:var(--faint);font-weight:400;margin-top:1px}
 
-td.r{text-align:center;padding:0.32rem 0.25rem;min-width:52px}
-td.r .chip{display:inline-flex;align-items:center;justify-content:center;width:1.9rem;height:1.6rem;border-radius:5px;font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;position:relative}
+td.r{text-align:center;padding:.3rem .22rem;min-width:50px;position:relative}
+td.r .chip{display:inline-flex;align-items:center;justify-content:center;width:1.85rem;height:1.55rem;border-radius:5px;font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:.74rem;position:relative}
 td.r.rA .chip{background:var(--A-bg);color:var(--A-fg)}
 td.r.rB .chip{background:var(--B-bg);color:var(--B-fg)}
 td.r.rC .chip{background:var(--C-bg);color:var(--C-fg)}
 td.r.rD .chip{background:var(--D-bg);color:var(--D-fg)}
-td.r.r_ .chip{background:var(--none-bg);color:var(--none-fg);font-weight:400;font-size:0.8rem}
-td.r.col-hidden{display:none}
+td.r.r_{} td.r.r_ .chip{background:var(--none-bg);color:var(--none-fg);font-weight:400;font-size:.78rem}
 td.r.has-tip{cursor:pointer}
-td.r.has-tip .chip::after{content:'';position:absolute;bottom:2px;right:2px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.4}
+td.r.has-tip .chip::after{content:'';position:absolute;bottom:2px;right:2px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.38}
 td.r.has-tip:hover .chip,td.r.has-tip.active .chip{filter:brightness(1.07);outline:2px solid currentColor;outline-offset:2px}
+td.r.best-col .chip{outline:2px solid rgba(12,68,33,.3);outline-offset:2px}
 
-/* best-col highlight */
-td.r.best-col{outline:2px solid rgba(12,68,33,0.25);outline-offset:-2px;border-radius:5px}
+/* confidence indicator — tiny dot bottom-left of chip */
+td.r[data-conf="interpolated"] .chip::before,
+td.r[data-conf="inferred"] .chip::before{content:'';position:absolute;top:2px;left:2px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.3}
 
-/* TOOLTIP */
-.tipbox{display:none;position:fixed;z-index:9999;max-width:255px;background:var(--tooltip-bg);color:var(--tooltip-text);border-radius:9px;padding:0.6rem 0.8rem;font-size:0.7rem;line-height:1.55;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,0.28),0 2px 6px rgba(0,0,0,0.18)}
+/* ── TOOLTIP ─────────────────────────────────────────────────────────────── */
+.tipbox{display:none;position:fixed;z-index:9999;max-width:268px;background:var(--tip-bg);color:var(--tip-text);border-radius:9px;padding:.6rem .8rem;font-size:.7rem;line-height:1.55;pointer-events:auto;box-shadow:0 8px 28px rgba(0,0,0,.28)}
+.tip-refs a{color:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:nowrap}
+.tip-refs a:hover{opacity:.8}
+@keyframes ref-flash{0%,100%{background:transparent}20%,70%{background:rgba(255,200,40,.35)}}
+.ref-highlight{animation:ref-flash 1.6s ease}
+.panel li{font-size:.69rem;color:var(--muted);line-height:1.6;margin-bottom:.1rem;border-radius:4px;padding:1px 3px;transition:background .15s}
+.ref-num{font-family:'IBM Plex Mono',monospace;font-size:.63rem;opacity:.55;margin-right:.3rem;min-width:2rem;display:inline-block}
 .tipbox.visible{display:block}
-.tip-header{font-weight:700;font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;opacity:0.6;margin-bottom:0.25rem}
-.tip-rating{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:0.72rem;padding:0.1rem 0.4rem;border-radius:4px;margin-bottom:0.35rem}
-.tip-text{opacity:0.92}
+.tip-hdr{font-weight:700;font-size:.67rem;letter-spacing:.04em;text-transform:uppercase;opacity:.58;margin-bottom:.22rem}
+.tip-rating{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:.7rem;padding:.08rem .38rem;border-radius:4px;margin-bottom:.32rem}
+.tip-body{opacity:.92;margin-bottom:.28rem}
+.tip-refs{font-size:.63rem;opacity:.52;border-top:1px solid rgba(255,255,255,.12);padding-top:.22rem;margin-top:.12rem;line-height:1.45}
 .tipbox.rC .tip-rating{background:var(--C-bg);color:var(--C-fg)}
 .tipbox.rD .tip-rating{background:var(--D-bg);color:var(--D-fg)}
 
-/* FOOTER */
-.panels{max-width:1400px;margin:1rem auto 0;display:grid;grid-template-columns:1fr 1fr;gap:0.9rem}
-@media(max-width:640px){.panels{grid-template-columns:1fr}}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem}
-.panel h3{font-size:0.78rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em}
-.panel dl{display:grid;grid-template-columns:1.6rem 1fr;gap:0.28rem 0.5rem;align-items:baseline}
-.panel dt{display:inline-flex;align-items:center;justify-content:center;width:1.5rem;height:1.25rem;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:0.7rem}
-.panel dd{font-size:0.7rem;color:var(--muted);line-height:1.5}
+/* ── FOOTER PANELS ───────────────────────────────────────────────────────── */
+.panels{max-width:1400px;margin:.95rem auto 0;display:grid;grid-template-columns:1fr 1fr;gap:.85rem}
+@media(max-width:600px){.panels{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:.85rem 1rem}
+.panel h3{font-size:.77rem;font-weight:700;margin-bottom:.48rem;letter-spacing:-.01em}
+.panel dl{display:grid;grid-template-columns:1.55rem 1fr;gap:.25rem .48rem;align-items:baseline}
+.panel dt{display:inline-flex;align-items:center;justify-content:center;width:1.45rem;height:1.2rem;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:.69rem}
+.panel dd{font-size:.69rem;color:var(--muted);line-height:1.5}
 .dtA{background:var(--A-bg);color:var(--A-fg)} .dtB{background:var(--B-bg);color:var(--B-fg)}
 .dtC{background:var(--C-bg);color:var(--C-fg)} .dtD{background:var(--D-bg);color:var(--D-fg)}
-.panel ul{padding-left:0.9rem;margin-top:0.1rem}
-.panel li{font-size:0.7rem;color:var(--muted);line-height:1.6;margin-bottom:0.12rem}
+.panel ul{padding-left:.85rem}
+.panel li{font-size:.69rem;color:var(--muted);line-height:1.6;margin-bottom:.1rem}
+.panel li a{color:var(--muted);text-underline-offset:2px}
+.conf-legend{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+.conf-item{display:flex;align-items:center;gap:.28rem;font-size:.67rem;color:var(--muted)}
+.cdot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--muted);opacity:.5}
 
+/* ── PRINT ───────────────────────────────────────────────────────────────── */
 @media print{
-  body{background:#fff;padding:0.5rem}
+  body{background:#fff;padding:.5rem}
   .hdr-sub,.btn-row,.controls,.legend,.panels{display:none}
   .card{box-shadow:none;border:1px solid #ccc;border-radius:0}
-  thead th{font-size:7pt;padding:4px 3px}
-  td.chem{font-size:7.5pt;padding:3px 4px}
-  td.r .chip{width:1.5rem;height:1.3rem;font-size:7.5pt}
-  td.chem .formula{font-size:6pt}
-  @page{size:landscape;margin:8mm}
+  thead th{font-size:6.5pt;padding:3px 2px}
+  td.chem-cell{font-size:7pt;padding:2px 3px}
+  td.r .chip{width:1.45rem;height:1.25rem;font-size:7pt}
+  td.chem-cell .fml{font-size:5.5pt}
+  @page{size:landscape;margin:7mm}
 }
 </style>
 </head>
@@ -145,48 +155,47 @@ td.r.best-col{outline:2px solid rgba(12,68,33,0.25);outline-offset:-2px;border-r
 <div class="hdr">
   <div>
     <div class="hdr-title">FDM Filament — Chemical Resistance</div>
-    <div class="hdr-sub">Prusament A–D immersion scale for 8 core materials. HIPS, PA12, POM, and TPU 95A added from published TDS and immersion data. 9 new chemicals added for shop/FPV relevance. Columns alphabetical. Tap/click C or D cells for failure details.</div>
+    <div class="hdr-sub">A–D immersion scale. Data sourced from Prusament 7-day lab study (PLA/PVB/PETG/ASA/ABS/PC/PA/PP), published TDS, and cross-referenced compatibility guides. HIPS, PA12, POM, TPU 95A, and 8 additional chemicals added. Click column headers to sort. Confidence: faint dot = interpolated or inferred.</div>
   </div>
   <div class="btn-row">
     <button class="tbtn" id="themeBtn">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       Light
     </button>
     <button class="tbtn" id="exportSvgBtn">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       SVG
     </button>
     <button class="tbtn" id="exportPngBtn">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
       PNG
     </button>
     <button class="tbtn" onclick="window.print()">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
       Print
     </button>
   </div>
 </div>
 
 <div class="controls">
-  <div class="search-wrap">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input id="searchInput" type="text" placeholder="Search chemical…" autocomplete="off">
+  <div class="ctrl-pill">
+    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" id="searchInput" placeholder="Search chemical…" autocomplete="off">
   </div>
   <div class="ctrl-sep"></div>
-  <div class="filter-group">
-    <span>Show only:</span>
-    <label><input type="checkbox" id="filterCD" value="CD"> C or D rated cells</label>
+  <div class="ctrl-pill">
+    <label><input type="checkbox" id="filterCD"> Show only C / D rows</label>
+  </div>
+  <div class="ctrl-pill">
+    <label><input type="checkbox" id="filterBest"> Best-material highlight</label>
   </div>
   <div class="ctrl-sep"></div>
-  <div class="filter-group">
-    <span>Highlight:</span>
-    <label><input type="checkbox" id="filterBest"> Best material per row</label>
-  </div>
-  <div class="ctrl-sep"></div>
-  <div class="mat-toggle-wrap">
-    <span>Columns:</span>
-    <button id="showAllMats" title="Show all materials">All</button>
-    <span id="matToggles"></span>
+  <div class="ctrl-pill">
+    <span style="margin-right:.15rem">Cols:</span>
+    <div class="mat-btns">
+      <button id="showAllBtn">All</button>
+      <span id="matToggleRow"></span>
+    </div>
   </div>
 </div>
 
@@ -201,345 +210,3021 @@ td.r.best-col{outline:2px solid rgba(12,68,33,0.25);outline-offset:-2px;border-r
   <div class="leg-sep"></div>
   <div class="leg-item"><span class="leg-chip leg-none">–</span> No data</div>
   <div class="leg-sep"></div>
-  <div class="leg-hint">
-    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.55"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V9a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-1a2 2 0 0 1 4 0"/></svg>
-    Tap C/D for details
-  </div>
+  <div class="leg-item" style="font-size:.67rem;opacity:.7">Tap C/D cells for details</div>
 </div>
 
 <div class="card"><div class="scroll">
   <table id="mainTable">
-    <thead><tr id="headerRow">
-      <th>Chemical</th>
-    </tr></thead>
+    <thead><tr id="headerRow"><th>Chemical</th></tr></thead>
     <tbody id="tbody"></tbody>
   </table>
 </div></div>
 
 <div class="tipbox" id="tipbox">
-  <div class="tip-header" id="tipHeader"></div>
+  <div class="tip-hdr" id="tipHdr"></div>
   <div class="tip-rating" id="tipRating"></div>
-  <div class="tip-text" id="tipText"></div>
+  <div class="tip-body" id="tipBody"></div>
+  <div class="tip-refs" id="tipRefs"></div>
 </div>
 
 <div class="panels">
   <div class="panel">
-    <h3>Rating Scale (Prusament A–D)</h3>
+    <h3>Rating Scale (A–D)</h3>
     <dl>
-      <dt class="dtA">A</dt><dd>Resists very well. No melt, absorption, or swelling after 1-week immersion (&lt;1% change in weight/dimensions).</dd>
-      <dt class="dtB">B</dt><dd>Resists moderately. Slight swelling or weight change (2–3%).</dd>
-      <dt class="dtC">C</dt><dd>Resists poorly. Significant swelling or change (4–5%) with prolonged exposure.</dd>
-      <dt class="dtD">D</dt><dd>Does not resist. Severe change (&gt;5%) or complete destruction of the material.</dd>
+      <dt class="dtA">A</dt><dd>Resists very well. &lt;1% change in weight or dimensions after 1-week immersion.</dd>
+      <dt class="dtB">B</dt><dd>Moderate resistance. 2–3% change; slight swelling or weight gain.</dd>
+      <dt class="dtC">C</dt><dd>Resists poorly. 4–5% change; significant swelling with prolonged exposure.</dd>
+      <dt class="dtD">D</dt><dd>Does not resist. &gt;5% change or complete destruction of the material.</dd>
     </dl>
+    <div class="conf-legend">
+      <div class="conf-item"><span class="cdot" style="opacity:1"></span> measured / TDS</div>
+      <div class="conf-item"><span class="cdot"></span> interpolated / inferred</div>
+    </div>
   </div>
   <div class="panel">
-    <h3>Data Sources</h3>
-    <ul>
-      <li><strong>ABS, ASA, PA, PC, PETG, PLA, PP, PVB</strong> — Prusament chemical resistance study, Prusa Research (2021).</li>
-      <li><strong>HIPS</strong> — Simplify3D materials guide; K-Mac plastics chemical resistance data.</li>
-      <li><strong>PA12</strong> — Paragon RT / Smith Metal Centres PA12 TDS; Filamentek chemical resistance chart.</li>
-      <li><strong>POM</strong> — K-Mac Plastics Acetal chart; ISM POM compatibility guide; Graco guide.</li>
-      <li><strong>TPU 95A</strong> — Forerunner 3D ESTANE® M95A immersion (2025); UltiMaker TDS; BASF Elastollan.</li>
-      <li><strong>New chemicals</strong> — IPA 91%: interpolated; Flux remover: MG Chemicals / Techspray TDS; Brake fluid: Reddit immersion reports + PP/PA TDS; WD-40/gasoline/motor oil: published plastics compatibility guides.</li>
-      <li>* Fridex = ethylene glycol antifreeze. ** Savo = NaClO 4.7 g/100 g. † Flux remover = IPA/EtOH/ethyl acetate blend. †† DOT3/4 = polyglycol ether base.</li>
-    </ul>
+    <h3>Primary Sources</h3>
+    <ul id="refList"></ul>
   </div>
 </div>
 
 <script>
-const MATS = ["ABS", "ASA", "HIPS", "PA", "PA12", "PC", "PETG", "PLA", "POM", "PP", "PVB", "TPU 95A"];
-const ROWS = [["Water", "H₂O", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "measured"], ["IPA 75%", "Isopropyl alcohol", "B", "B", "C", "A", "A", "B", "A", "C", "A", "A", "D", "C", "measured"], ["IPA 91%", "Isopropyl alcohol", "B", "B", "D", "A", "A", "B", "A", "C", "A", "A", "D", "C", "measured"], ["IPA 99%", "Isopropyl alcohol", "B", "B", "D", "A", "A", "B", "B", "C", "A", "A", "D", "D", "measured"], ["Acetic acid 8%", "Vinegar C₂H₄O₂", "B", "A", "B", "C", "B", "A", "A", "B", "B", "A", "C", "B", "estimated"], ["Sodium chloride 10%", "Salt NaCl", "A", "B", "A", "A", "A", "A", "A", "B", "A", "A", "B", "A", "measured"], ["Citric acid", "C₆H₈O₇", "-", "A", "A", "B", "A", "A", "A", "B", "A", "A", "B", "B", "estimated"], ["Hydrochloric acid 37%", "HCl", "C", "C", "C", "D", "C", "A", "A", "C", "B", "A", "-", "D", "inferred"], ["Hydrogen peroxide 30%", "H₂O₂", "A", "A", "B", "A", "A", "A", "A", "B", "B", "A", "-", "B", "measured"], ["Phosphoric acid 85%", "H₃PO₄", "-", "A", "B", "D", "B", "A", "C", "C", "A", "A", "-", "C", "inferred"], ["Nitric acid 69%", "HNO₃", "A", "-", "D", "D", "D", "D", "D", "D", "D", "A", "-", "D", "inferred"], ["Sulphuric acid 96%", "H₂SO₄", "-", "-", "D", "D", "D", "D", "D", "D", "C", "A", "-", "D", "inferred"], ["Fridex *", "Ethylene glycol C₂H₆O₂", "-", "A", "A", "-", "A", "A", "A", "B", "A", "A", "B", "A", "measured"], ["Savo **", "NaClO", "-", "A", "B", "A", "A", "B", "A", "B", "B", "A", "B", "C", "estimated"], ["Ethanol", "C₂H₆O", "A", "B", "D", "A", "A", "B", "B", "C", "A", "A", "D", "D", "measured"], ["Acetone", "C₃H₆O", "D", "D", "D", "A", "A", "C", "C", "D", "A", "A", "D", "D", "measured"], ["WD-40 / Mineral oil", "Petroleum distillates", "B", "B", "B", "A", "A", "B", "B", "B", "A", "A", "B", "B", "estimated"], ["Flux remover †", "IPA/EtOH/ethyl acetate", "D", "C", "D", "B", "B", "C", "B", "C", "A", "A", "D", "C", "estimated"], ["Brake fluid DOT3/4 ††", "Polyglycol ethers", "C", "C", "C", "A", "A", "C", "B", "D", "A", "A", "D", "B", "estimated"], ["Gasoline / petrol", "Aliphatic hydrocarbons", "C", "B", "C", "A", "A", "B", "B", "C", "A", "A", "C", "B", "estimated"], ["Motor oil", "Mineral oil base", "A", "A", "A", "A", "A", "A", "A", "B", "A", "A", "A", "A", "estimated"], ["NaOH lye 10%", "Sodium hydroxide", "B", "B", "B", "D", "B", "B", "A", "D", "D", "A", "B", "B", "estimated"], ["CA glue (cyanoacrylate)", "Ethyl 2-cyanoacrylate", "B", "B", "B", "A", "A", "C", "A", "B", "A", "A", "B", "B", "estimated"]];
-const TIPS = {"IPA 75%|HIPS": "Surface whitening and swelling. HIPS is styrene-based and susceptible to alcohols; prolonged 75% IPA exposure causes visible surface attack.", "IPA 75%|PLA": "Surface becomes tacky with micro-crazing. Significant weight gain (4–5%) observed; surface gloss lost after extended exposure.", "IPA 75%|PVB": "Material dissolves rapidly — PVB is used intentionally as an IPA-soluble support. Complete structural breakdown within hours.", "IPA 75%|TPU 95A": "Surface softening and swelling (~10–15% volume change) after extended immersion. Elasticity and tensile strength reduce significantly.", "IPA 91%|HIPS": "Significant surface attack and dissolution of styrene phase. 91% IPA is aggressive enough to fully degrade HIPS.", "IPA 91%|PLA": "Crazing and surface degradation similar to 75% but faster. Part warps under load after prolonged exposure.", "IPA 91%|PVB": "Complete dissolution — PVB dissolves readily in IPA at all concentrations above ~50%.", "IPA 91%|TPU 95A": "Noticeable swelling and strength loss. Higher IPA concentration increases aggression vs. 75% IPA.", "IPA 99%|HIPS": "Complete surface dissolution. Anhydrous IPA fully destroys HIPS — same mechanism as acetone on ABS.", "IPA 99%|PLA": "Severe crazing and warping. Anhydrous IPA is more aggressive than 75%; part loses dimensional stability.", "IPA 99%|PVB": "Complete destruction within minutes. PVB is highly soluble in pure IPA.", "IPA 99%|TPU 95A": "Severe swelling (>15% volume) and major tensile strength loss. Pure IPA is significantly more aggressive than 75% on TPU.", "Acetic acid 8%|PA": "Acetic acid attacks nylon amide bonds causing hydrolysis and surface degradation. Substantial swelling and loss of mechanical properties.", "Acetic acid 8%|PVB": "Significant weight gain and surface attack. PVB is an acetate-derived polymer susceptible to acetic acid hydrolysis.", "Hydrochloric acid 37%|ABS": "Surface etching, crazing, and swelling of styrene/butadiene phases. HCl degrades the rubber component of ABS.", "Hydrochloric acid 37%|ASA": "Surface dulling and micro-crazing. Concentrated HCl causes surface attack on ASA's styrene phase.", "Hydrochloric acid 37%|HIPS": "Surface whitening, softening, and micro-crazing. Concentrated HCl attacks HIPS over prolonged immersion.", "Hydrochloric acid 37%|PA": "Severe — HCl protonates amide groups in nylon causing rapid hydrolysis and dissolution. Major weight gain and structural failure.", "Hydrochloric acid 37%|PA12": "Concentrated HCl partially hydrolyzes PA12 amide bonds; less severe than PA6 due to lower amide density but still causes significant weight gain.", "Hydrochloric acid 37%|PLA": "Strong acid accelerates PLA hydrolysis; surface becomes rough and pitted with significant weight change.", "Hydrochloric acid 37%|TPU 95A": "Strong acid causes hydrolysis of urethane linkages. Significant surface degradation; structural integrity compromised.", "Hydrogen peroxide 30%|HIPS": "Oxidizing agent causes surface bleaching and slight mechanical degradation in HIPS over prolonged exposure.", "Hydrogen peroxide 30%|POM": "Moderate oxidative attack on POM surface. H₂O₂ causes measurable weight gain and surface dulling.", "Hydrogen peroxide 30%|PLA": "Moderate surface attack. Concentrated H₂O₂ combines oxidation with hydrolysis on PLA ester bonds; slight softening observed.", "Phosphoric acid 85%|PA": "Severe — phosphoric acid attacks nylon amide bonds causing hydrolysis. Part swells significantly and loses all structural strength.", "Phosphoric acid 85%|PA12": "Moderate attack. PA12's lower amide density reduces severity vs. PA6 but concentrated H₃PO₄ still causes measurable degradation.", "Phosphoric acid 85%|PETG": "Surface pitting and weight gain at 4–5% range. Concentrated phosphoric acid attacks PETG over prolonged exposure.", "Phosphoric acid 85%|PLA": "Surface becomes sticky and deformed. Concentrated phosphoric acid accelerates hydrolysis of PLA ester bonds; part loses rigidity.", "Phosphoric acid 85%|TPU 95A": "Moderate surface attack and swelling. Phosphoric acid partially hydrolyzes urethane linkages; hardness and elongation reduced noticeably.", "Nitric acid 69%|HIPS": "Rapid surface oxidation and yellowing. Concentrated nitric acid attacks styrene phase causing color change and severe embrittlement.", "Nitric acid 69%|PA": "Complete attack — nitric acid rapidly destroys nylon via oxidation and hydrolysis. Complete part failure.", "Nitric acid 69%|PA12": "Severe oxidative attack similar to PA6. Nitric acid destroys PA12 via chain scission and oxidation.", "Nitric acid 69%|PC": "Severe yellowing and surface crazing. Nitric acid nitrates bisphenol-A aromatic rings causing rapid color change and embrittlement.", "Nitric acid 69%|PETG": "Severe surface oxidation. Nitric acid attacks aromatic rings in PETG causing discoloration and structural failure.", "Nitric acid 69%|PLA": "Rapid oxidative attack causing yellowing, surface crumbling, and part destruction. Nitric acid both hydrolyzes and oxidizes PLA.", "Nitric acid 69%|POM": "Complete surface destruction. Nitric acid rapidly oxidizes and depolymerizes POM (formaldehyde release). Part fully destroyed.", "Nitric acid 69%|TPU 95A": "Oxidizing acid causes rapid surface destruction. Nitric acid attacks urethane linkages and oxidizes soft segments; part destroyed within hours.", "Sulphuric acid 96%|HIPS": "Sulfonation and severe surface degradation. Concentrated H₂SO₄ destroys HIPS rapidly.", "Sulphuric acid 96%|PA": "Complete destruction — sulphuric acid hydrolyzes and protonates nylon rapidly. Part dissolves / fully decomposes.", "Sulphuric acid 96%|PA12": "Severe — concentrated H₂SO₄ causes rapid hydrolysis and protonation of PA12 amide groups. Complete structural failure.", "Sulphuric acid 96%|PC": "Catastrophic surface attack. H₂SO₄ sulfonates PC's aromatic groups causing extreme embrittlement and crumbling.", "Sulphuric acid 96%|PETG": "Severe sulfonation of aromatic ring. Part surface blackens and loses all mechanical integrity.", "Sulphuric acid 96%|PLA": "Rapid hydrolysis and charring. Concentrated H₂SO₄ acts as both acid and dehydrating agent; PLA fully destroyed.", "Sulphuric acid 96%|POM": "Catastrophic depolymerization. Concentrated H₂SO₄ causes immediate breakdown of POM into formaldehyde; part is destroyed.", "Sulphuric acid 96%|TPU 95A": "Complete structural failure. Concentrated H₂SO₄ hydrolyzes urethane bonds and oxidizes the polymer backbone; rapid dissolution observed.", "Savo **|TPU 95A": "Sodium hypochlorite causes oxidative chain scission in TPU. Prolonged exposure causes surface tackiness and hardness reduction.", "Ethanol|HIPS": "Complete dissolution — HIPS dissolves readily in ethanol and other alcohols. Full structural collapse.", "Ethanol|PLA": "Surface becomes tacky and slightly swollen. Ethanol is a weak plasticizer for PLA; prolonged contact causes measurable dimensional change.", "Ethanol|PVB": "Rapid dissolution — PVB is highly soluble in ethanol. Complete structural collapse within hours.", "Ethanol|TPU 95A": "Severe swelling (>20% volume change). Ethanol is one of the worst solvents for TPU; elasticity and strength severely reduced.", "Acetone|ABS": "Complete dissolution — acetone is intentionally used to smooth/bond ABS. Immersion causes full structural failure.", "Acetone|ASA": "Rapid surface attack and dissolution of styrene phase. ASA is highly susceptible to ketones; part surface becomes liquid-like.", "Acetone|HIPS": "Complete dissolution — HIPS is a styrene copolymer and dissolves rapidly in acetone, similar to ABS.", "Acetone|PC": "Surface crazing, micro-cracking, and significant swelling. Acetone causes stress cracking in PC particularly under any mechanical load.", "Acetone|PETG": "Significant surface crazing and swelling (4–5%). Acetone does not fully dissolve PETG but causes surface whitening, cracking, and embrittlement.", "Acetone|PLA": "Rapid dissolution and surface melting. Acetone is a strong solvent for PLA; parts warp, delaminate, and lose all structural integrity.", "Acetone|PVB": "Complete destruction within minutes. PVB dissolves rapidly in acetone and all ketone solvents.", "Acetone|TPU 95A": "Complete failure — acetone fully penetrates TPU causing massive swelling and dissolution of soft segments. Part loses all structural integrity.", "Flux remover †|ABS": "IPA/ethanol/ethyl acetate blend attacks ABS's styrene-butadiene rubber phase. Crazing, swelling, and surface dissolution observed.", "Flux remover †|ASA": "Ethyl acetate and alcohols in flux remover cause surface attack on ASA's styrene phase. Significant surface dulling and micro-crazing.", "Flux remover †|HIPS": "Complete dissolution — HIPS is vulnerable to both alcohol and ester solvents present in most flux removers.", "Flux remover †|PC": "Flux remover solvents cause surface stress cracking and crazing in PC. Avoid contact with any loaded PC parts.", "Flux remover †|PLA": "IPA and ethyl acetate in flux remover attack PLA's ester backbone. Surface becomes tacky and dimensionally unstable.", "Flux remover †|PVB": "Complete dissolution — PVB dissolves in all IPA/alcohol-based flux removers.", "Flux remover †|TPU 95A": "Blend of alcohols and esters causes significant swelling and surface softening in TPU. PA or PP are better choices near flux remover.", "Brake fluid DOT3/4 ††|ABS": "DOT3/4 polyglycol ethers cause embrittlement and surface attack on ABS. Not recommended for brake-adjacent printed parts.", "Brake fluid DOT3/4 ††|ASA": "Polyglycol ethers in DOT3/4 cause surface crazing and weight gain in ASA over prolonged exposure.", "Brake fluid DOT3/4 ††|HIPS": "HIPS degrades significantly in DOT3/4. Styrene-based polymers are generally not brake-fluid compatible.", "Brake fluid DOT3/4 ††|PC": "Glycol ether solvents in DOT3/4 cause surface stress cracking in polycarbonate. Not recommended.", "Brake fluid DOT3/4 ††|PLA": "Severe degradation — glycol ethers and residual water in brake fluid aggressively attack PLA's ester linkages. Part softens and deforms.", "Brake fluid DOT3/4 ††|PVB": "Complete dissolution — PVB is highly susceptible to polyglycol ether solvents in brake fluid.", "Gasoline / petrol|ABS": "Aliphatic and aromatic hydrocarbons in gasoline swell and soften ABS. Not suitable for fuel-contact applications.", "Gasoline / petrol|HIPS": "Significant swelling and surface attack. Aromatic fractions in gasoline dissolve HIPS's styrene phase.", "Gasoline / petrol|PLA": "Significant swelling and surface crazing. Gasoline penetrates PLA causing dimensional instability; not suitable for fuel contact.", "Gasoline / petrol|PVB": "Moderate to severe attack from aromatic hydrocarbon content in gasoline. PVB swells significantly.", "NaOH lye 10%|PA": "Significant — NaOH hydrolyzes nylon amide bonds at even low concentrations. Prolonged exposure causes surface degradation and loss of strength.", "NaOH lye 10%|PLA": "Complete destruction — NaOH rapidly hydrolyzes PLA's ester bonds causing rapid dissolution. PLA has no resistance to strong alkalis.", "NaOH lye 10%|POM": "Complete destruction — NaOH depolymerizes POM at the chain ends (end-group unzipping) causing rapid dissolution. POM has zero alkali resistance.", "CA glue (cyanoacrylate)|PC": "CA glue reacts exothermically with polycarbonate causing localized stress cracking and surface crazing at the bond site."};
+// ════════════════════════════════════════════════════════════════════════════
+//  DATA — edit this object to add materials, chemicals, or ratings.
+//  Structure:
+//    materials.{mat_slug}._meta         — display name, full name
+//    materials.{mat_slug}.chemicals.{chem_slug}
+//                                       — rating, confidence, tip, references[]
+//    chemicals.{chem_slug}              — name, aka[], notes
+//    references.{ref_slug}              — title, authors, year, url, notes
+//
+//  To add a new chemical: add an entry to `chemicals`, then add ratings for
+//  any materials you have data for. Missing combinations are inferred as
+//  no-data automatically — you do NOT need to add null placeholders.
+//
+//  To add a new material: add an entry to `materials` with a `_meta` block
+//  and a `chemicals` block containing whatever ratings you have.
+// ════════════════════════════════════════════════════════════════════════════
+const DATA = {
+  "materials": {
+    "abs": {
+      "_meta": {
+        "name": "ABS",
+        "full_name": "Acrylonitrile Butadiene Styrene"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "B",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "B",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface etching, crazing, and swelling of styrene/butadiene phases. HCl degrades the rubber component of ABS.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Complete dissolution — acetone is intentionally used to smooth and bond ABS. Immersion causes full structural failure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "flux_remover": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "IPA/ethanol/ethyl acetate blend attacks ABS's styrene-butadiene rubber phase. Crazing, swelling, and surface dissolution observed.",
+          "references": [
+            "mg_chemicals_tds"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "DOT3/4 polyglycol ethers cause embrittlement and surface attack on ABS. Not recommended for brake-adjacent printed parts.",
+          "references": [
+            "reddit_brakefluid_2023"
+          ]
+        },
+        "gasoline": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Aliphatic and aromatic hydrocarbons in gasoline swell and soften ABS. Not suitable for fuel-contact applications.",
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "ca_glue": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "asa": {
+      "_meta": {
+        "name": "ASA",
+        "full_name": "Acrylonitrile Styrene Acrylate"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "B",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "B",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface dulling and micro-crazing. Concentrated HCl causes surface attack on ASA's styrene phase.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Rapid surface attack and dissolution of styrene phase. ASA is highly susceptible to ketones; part surface becomes liquid-like.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "flux_remover": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Ethyl acetate and alcohols in flux remover cause surface attack on ASA's styrene phase. Significant surface dulling and micro-crazing.",
+          "references": [
+            "mg_chemicals_tds"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Polyglycol ethers in DOT3/4 cause surface crazing and weight gain in ASA over prolonged exposure.",
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "gasoline": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "ca_glue": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "hips": {
+      "_meta": {
+        "name": "HIPS",
+        "full_name": "High Impact Polystyrene"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "simplify3d_guide",
+            "kmac_hips"
+          ]
+        },
+        "ipa_75": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Surface whitening and swelling. HIPS is styrene-based and susceptible to alcohols; prolonged 75% IPA exposure causes visible surface attack.",
+          "references": [
+            "simplify3d_guide"
+          ]
+        },
+        "ipa_91": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Significant surface attack and dissolution of styrene phase. 91% IPA is aggressive enough to fully degrade HIPS.",
+          "references": [
+            "simplify3d_guide"
+          ]
+        },
+        "ipa_99": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete surface dissolution. Anhydrous IPA fully destroys HIPS — same mechanism as acetone on ABS.",
+          "references": [
+            "simplify3d_guide"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "hcl_37": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Surface whitening, softening, and micro-crazing. Concentrated HCl attacks HIPS over prolonged immersion.",
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": "Oxidizing agent causes surface bleaching and slight mechanical degradation in HIPS over prolonged exposure.",
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Rapid surface oxidation and yellowing. Concentrated nitric acid attacks styrene phase causing color change and severe embrittlement.",
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Sulfonation and severe surface degradation. Concentrated H₂SO₄ destroys HIPS rapidly.",
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "ethanol": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete dissolution — HIPS dissolves readily in ethanol and other alcohols. Full structural collapse.",
+          "references": [
+            "simplify3d_guide"
+          ]
+        },
+        "acetone": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete dissolution — HIPS is a styrene copolymer and dissolves rapidly in acetone, similar to ABS.",
+          "references": [
+            "simplify3d_guide"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "flux_remover": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete dissolution — HIPS is vulnerable to both alcohol and ester solvents present in most flux removers.",
+          "references": [
+            "mg_chemicals_tds",
+            "simplify3d_guide"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "HIPS degrades significantly in DOT3/4. Styrene-based polymers are generally not brake-fluid compatible.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "gasoline": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Significant swelling and surface attack. Aromatic fractions in gasoline dissolve HIPS's styrene phase.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_hips"
+          ]
+        },
+        "ca_glue": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pa": {
+      "_meta": {
+        "name": "PA",
+        "full_name": "Polyamide (Nylon 6 / Nylon 6,6)"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Acetic acid attacks nylon amide bonds causing hydrolysis and surface degradation. Substantial swelling and loss of mechanical properties.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe — HCl protonates amide groups in nylon causing rapid hydrolysis and dissolution. Major weight gain and structural failure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe — phosphoric acid attacks nylon amide bonds causing hydrolysis. Part swells significantly and loses all structural strength.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Complete attack — nitric acid rapidly destroys nylon via oxidation and hydrolysis. Complete part failure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Complete destruction — sulphuric acid hydrolyzes and protonates nylon rapidly. Part dissolves / fully decomposes.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "-",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "flux_remover": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "mg_chemicals_tds"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "gasoline": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "naoh_10": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Significant — NaOH hydrolyzes nylon amide bonds at even low concentrations. Prolonged exposure causes surface degradation and loss of strength.",
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "ca_glue": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pa12": {
+      "_meta": {
+        "name": "PA12",
+        "full_name": "Polyamide 12 (Nylon 12)"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12",
+            "filamentek_pa12"
+          ]
+        },
+        "ipa_75": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "ipa_91": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "ipa_99": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "hcl_37": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Concentrated HCl partially hydrolyzes PA12 amide bonds; less severe than PA6 due to lower amide density but still causes significant weight gain.",
+          "references": [
+            "smithmetal_pa12",
+            "filamentek_pa12"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": "Moderate attack. PA12's lower amide density reduces severity vs. PA6 but concentrated H₃PO₄ still causes measurable degradation.",
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Severe oxidative attack similar to PA6. Nitric acid destroys PA12 via chain scission and oxidation.",
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Severe — concentrated H₂SO₄ causes rapid hydrolysis and protonation of PA12 amide groups. Complete structural failure.",
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "ethanol": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "acetone": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "flux_remover": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "gasoline": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "smithmetal_pa12"
+          ]
+        },
+        "ca_glue": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pc": {
+      "_meta": {
+        "name": "PC",
+        "full_name": "Polycarbonate"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "B",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "B",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe yellowing and surface crazing. Nitric acid nitrates bisphenol-A aromatic rings causing rapid color change and embrittlement.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Catastrophic surface attack. H₂SO₄ sulfonates PC's aromatic groups causing extreme embrittlement and crumbling.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface crazing, micro-cracking, and significant swelling. Acetone causes stress cracking in PC, particularly under any mechanical load.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "flux_remover": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Flux remover solvents cause surface stress cracking and crazing in PC. Avoid contact with any loaded PC parts.",
+          "references": [
+            "mg_chemicals_tds"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Glycol ether solvents in DOT3/4 cause surface stress cracking in polycarbonate. Not recommended.",
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "gasoline": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "ca_glue": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "CA glue reacts exothermically with polycarbonate causing localized stress cracking and surface crazing at the bond site.",
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "petg": {
+      "_meta": {
+        "name": "PETG",
+        "full_name": "Polyethylene Terephthalate Glycol"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface pitting and weight gain at 4–5% range. Concentrated phosphoric acid attacks PETG over prolonged exposure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe surface oxidation. Nitric acid attacks aromatic rings in PETG causing discoloration and structural failure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe sulfonation of aromatic ring. Part surface blackens and loses all mechanical integrity.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Significant surface crazing and swelling (4–5%). Acetone does not fully dissolve PETG but causes surface whitening, cracking, and embrittlement.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_petg"
+          ]
+        },
+        "flux_remover": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "mg_chemicals_tds",
+            "kmac_petg"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "reddit_brakefluid_2023"
+          ]
+        },
+        "gasoline": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_petg"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_petg"
+          ]
+        },
+        "naoh_10": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_petg"
+          ]
+        },
+        "ca_glue": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pla": {
+      "_meta": {
+        "name": "PLA",
+        "full_name": "Polylactic Acid"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface becomes tacky with micro-crazing. Significant weight gain (4–5%) observed; surface gloss lost after extended exposure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "C",
+          "confidence": "interpolated",
+          "tip": "Crazing and surface degradation similar to 75% but faster. Part warps under load after prolonged exposure.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Severe crazing and warping. Anhydrous IPA is more aggressive than 75%; part loses dimensional stability.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Strong acid accelerates PLA hydrolysis; surface becomes rough and pitted with significant weight change.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Moderate surface attack. Concentrated H₂O₂ combines oxidation with hydrolysis on PLA ester bonds; slight softening observed.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface becomes sticky and deformed. Concentrated phosphoric acid accelerates hydrolysis of PLA ester bonds; part loses rigidity.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Rapid oxidative attack causing yellowing, surface crumbling, and part destruction. Nitric acid both hydrolyzes and oxidizes PLA.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Rapid hydrolysis and charring. Concentrated H₂SO₄ acts as both acid and dehydrating agent; PLA fully destroyed.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface becomes tacky and slightly swollen. Ethanol is a weak plasticizer for PLA; prolonged contact causes measurable dimensional change.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Rapid dissolution and surface melting. Acetone is a strong solvent for PLA; parts warp, delaminate, and lose all structural integrity.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "flux_remover": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "IPA and ethyl acetate in flux remover attack PLA's ester backbone. Surface becomes tacky and dimensionally unstable.",
+          "references": [
+            "mg_chemicals_tds"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Severe degradation — glycol ethers and residual water in brake fluid aggressively attack PLA's ester linkages. Part softens and deforms.",
+          "references": [
+            "reddit_brakefluid_2023",
+            "general_chem"
+          ]
+        },
+        "gasoline": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Significant swelling and surface crazing. Gasoline penetrates PLA causing dimensional instability; not suitable for fuel contact.",
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "naoh_10": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete destruction — NaOH rapidly hydrolyzes PLA's ester bonds causing rapid dissolution. PLA has no resistance to strong alkalis.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "ca_glue": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pom": {
+      "_meta": {
+        "name": "POM",
+        "full_name": "Polyoxymethylene (Acetal / Delrin)"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom",
+            "ism_pom"
+          ]
+        },
+        "ipa_75": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "ipa_91": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "ipa_99": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "hcl_37": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom",
+            "ism_pom"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": "Moderate oxidative attack on POM surface. H₂O₂ causes measurable weight gain and surface dulling.",
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete surface destruction. Nitric acid rapidly oxidizes and depolymerizes POM (formaldehyde release). Part fully destroyed.",
+          "references": [
+            "kmac_pom",
+            "ism_pom"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Catastrophic depolymerization. Concentrated H₂SO₄ causes immediate breakdown of POM into formaldehyde; part is destroyed.",
+          "references": [
+            "kmac_pom",
+            "ism_pom"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "ethanol": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "acetone": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "flux_remover": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "kmac_pom",
+            "general_chem"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "gasoline": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "kmac_pom"
+          ]
+        },
+        "naoh_10": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete destruction — NaOH depolymerizes POM at chain ends (end-group unzipping) causing rapid dissolution. POM has zero alkali resistance.",
+          "references": [
+            "kmac_pom",
+            "ism_pom"
+          ]
+        },
+        "ca_glue": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pp": {
+      "_meta": {
+        "name": "PP",
+        "full_name": "Polypropylene"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "A",
+          "confidence": "interpolated",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hcl_37": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "hno3_69": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "flux_remover": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "gasoline": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "naoh_10": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "graco_compat"
+          ]
+        },
+        "ca_glue": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "pvb": {
+      "_meta": {
+        "name": "PVB",
+        "full_name": "Polyvinyl Butyral"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_75": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Material dissolves rapidly — PVB is used intentionally as an IPA-soluble support. Complete structural breakdown within hours.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_91": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete dissolution — PVB dissolves readily in IPA at all concentrations above ~50%.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ipa_99": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Complete destruction within minutes. PVB is highly soluble in pure IPA.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Significant weight gain and surface attack. PVB is an acetate-derived polymer susceptible to acetic acid hydrolysis.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "citric_acid": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "ethanol": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Rapid dissolution — PVB is highly soluble in ethanol. Complete structural collapse within hours.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "acetone": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Complete destruction within minutes. PVB dissolves rapidly in acetone and all ketone solvents.",
+          "references": [
+            "prusament_2021"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "flux_remover": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Complete dissolution — PVB dissolves in all IPA/alcohol-based flux removers.",
+          "references": [
+            "mg_chemicals_tds"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Complete dissolution — PVB is highly susceptible to polyglycol ether solvents in brake fluid.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "gasoline": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Moderate to severe attack from aromatic hydrocarbon content in gasoline. PVB swells significantly.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        },
+        "ca_glue": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    },
+    "tpu_95a": {
+      "_meta": {
+        "name": "TPU 95A",
+        "full_name": "Thermoplastic Polyurethane Shore 95A"
+      },
+      "chemicals": {
+        "water": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "forerunner_tpu_2025",
+            "ultimaker_tpu_tds"
+          ]
+        },
+        "ipa_75": {
+          "rating": "C",
+          "confidence": "measured",
+          "tip": "Surface softening and swelling (~10–15% volume change) after extended immersion. Elasticity and tensile strength reduce significantly.",
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "ipa_91": {
+          "rating": "C",
+          "confidence": "interpolated",
+          "tip": "Noticeable swelling and strength loss. Higher IPA concentration increases aggression vs. 75% IPA.",
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "ipa_99": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe swelling (>15% volume) and major tensile strength loss. Pure IPA is significantly more aggressive than 75% on TPU.",
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "acetic_acid_8": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "sodium_chloride": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "citric_acid": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "hcl_37": {
+          "rating": "D",
+          "confidence": "tds",
+          "tip": "Strong acid causes hydrolysis of urethane linkages. Significant surface degradation; structural integrity compromised.",
+          "references": [
+            "basf_elastollan",
+            "forerunner_tpu_2025"
+          ]
+        },
+        "h2o2_30": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "h3po4_85": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Moderate surface attack and swelling. Phosphoric acid partially hydrolyzes urethane linkages; hardness and elongation reduced noticeably.",
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "hno3_69": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Oxidizing acid causes rapid surface destruction. Nitric acid attacks urethane linkages and oxidizes soft segments; part destroyed within hours.",
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "h2so4_96": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Complete structural failure. Concentrated H₂SO₄ hydrolyzes urethane bonds and oxidizes the polymer backbone; rapid dissolution observed.",
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "ethylene_glycol": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": null,
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "sodium_hypochlorite": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Sodium hypochlorite causes oxidative chain scission in TPU. Prolonged exposure causes surface tackiness and hardness reduction.",
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "ethanol": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Severe swelling (>20% volume change). Ethanol is one of the worst solvents for TPU; elasticity and strength severely reduced.",
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "acetone": {
+          "rating": "D",
+          "confidence": "measured",
+          "tip": "Complete failure — acetone fully penetrates TPU causing massive swelling and dissolution of soft segments. Part loses all structural integrity.",
+          "references": [
+            "forerunner_tpu_2025"
+          ]
+        },
+        "wd40": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "flux_remover": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Blend of alcohols and esters causes significant swelling and surface softening in TPU. PA or PP are better choices near flux remover.",
+          "references": [
+            "mg_chemicals_tds",
+            "basf_elastollan"
+          ]
+        },
+        "brake_fluid_dot34": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "gasoline": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "motor_oil": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "naoh_10": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": null,
+          "references": [
+            "basf_elastollan"
+          ]
+        },
+        "ca_glue": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": null,
+          "references": [
+            "general_chem"
+          ]
+        }
+      }
+    }
+  },
+  "chemicals": {
+    "water": {
+      "name": "Water",
+      "aka": [
+        "H₂O"
+      ],
+      "notes": "Deionised or tap water, room temperature."
+    },
+    "ipa_75": {
+      "name": "IPA 75%",
+      "aka": [
+        "Isopropyl alcohol 75%",
+        "Isopropanol 75%",
+        "C₃H₈O"
+      ],
+      "notes": "75% v/v isopropyl alcohol in water. Common hand sanitiser and surface disinfectant concentration."
+    },
+    "ipa_91": {
+      "name": "IPA 91%",
+      "aka": [
+        "Isopropyl alcohol 91%",
+        "Isopropanol 91%",
+        "C₃H₈O"
+      ],
+      "notes": "91% v/v isopropyl alcohol. Most common electronics cleaning and FPV shop concentration."
+    },
+    "ipa_99": {
+      "name": "IPA 99%",
+      "aka": [
+        "Isopropyl alcohol 99%",
+        "Anhydrous isopropanol",
+        "C₃H₈O"
+      ],
+      "notes": "Near-anhydrous IPA. More aggressive than dilute forms due to absence of water."
+    },
+    "acetic_acid_8": {
+      "name": "Acetic acid 8%",
+      "aka": [
+        "Vinegar",
+        "Ethanoic acid 8%",
+        "C₂H₄O₂"
+      ],
+      "notes": "~8% acetic acid solution, equivalent to household white vinegar."
+    },
+    "sodium_chloride": {
+      "name": "Sodium chloride 10%",
+      "aka": [
+        "Salt solution",
+        "NaCl",
+        "Saline 10%"
+      ],
+      "notes": "10% w/v NaCl in water. Represents salt spray or brine environments."
+    },
+    "citric_acid": {
+      "name": "Citric acid",
+      "aka": [
+        "C₆H₈O₇",
+        "Lemon salt"
+      ],
+      "notes": "Saturated or 10% citric acid solution."
+    },
+    "hcl_37": {
+      "name": "Hydrochloric acid 37%",
+      "aka": [
+        "HCl 37%",
+        "Muriatic acid",
+        "Spirits of salt"
+      ],
+      "notes": "Concentrated hydrochloric acid (fuming), 37% w/w. Strong inorganic acid."
+    },
+    "h2o2_30": {
+      "name": "Hydrogen peroxide 30%",
+      "aka": [
+        "H₂O₂ 30%"
+      ],
+      "notes": "30% w/v hydrogen peroxide. Strong oxidising agent; well above household 3% concentration."
+    },
+    "h3po4_85": {
+      "name": "Phosphoric acid 85%",
+      "aka": [
+        "H₃PO₄",
+        "Orthophosphoric acid"
+      ],
+      "notes": "85% w/w phosphoric acid. Used in rust converters and electronics PCB cleaning."
+    },
+    "hno3_69": {
+      "name": "Nitric acid 69%",
+      "aka": [
+        "HNO₃",
+        "Aqua fortis"
+      ],
+      "notes": "69% w/w nitric acid. Strong oxidising acid; highly aggressive toward most organic polymers."
+    },
+    "h2so4_96": {
+      "name": "Sulphuric acid 96%",
+      "aka": [
+        "H₂SO₄",
+        "Sulfuric acid",
+        "Oil of vitriol"
+      ],
+      "notes": "96% w/w sulphuric acid. Concentrated; acts as both a strong acid and a dehydrating agent."
+    },
+    "ethylene_glycol": {
+      "name": "Fridex / Ethylene glycol",
+      "aka": [
+        "Fridex",
+        "C₂H₆O₂",
+        "MEG",
+        "Antifreeze"
+      ],
+      "notes": "Fridex is an industry trade name for ethylene glycol-based automotive antifreeze concentrate."
+    },
+    "sodium_hypochlorite": {
+      "name": "Savo / Sodium hypochlorite",
+      "aka": [
+        "Savo",
+        "NaClO",
+        "Bleach",
+        "Hypochlorite"
+      ],
+      "notes": "Savo is a Czech/Slovak brand disinfectant containing 4.7 g NaClO per 100 g. Equivalent to dilute household bleach."
+    },
+    "ethanol": {
+      "name": "Ethanol",
+      "aka": [
+        "Ethyl alcohol",
+        "C₂H₆O",
+        "Methylated spirits (denatured)"
+      ],
+      "notes": "Absolute or near-absolute ethanol."
+    },
+    "acetone": {
+      "name": "Acetone",
+      "aka": [
+        "Propanone",
+        "C₃H₆O",
+        "Nail polish remover"
+      ],
+      "notes": "Pure acetone. Common solvent; intentionally used to smooth ABS."
+    },
+    "wd40": {
+      "name": "WD-40 / Mineral oil",
+      "aka": [
+        "WD-40",
+        "Petroleum distillates",
+        "Mineral spirits",
+        "White spirit"
+      ],
+      "notes": "Petroleum distillate-based lubricant/displacing fluid. Representative of light mineral oil and penetrating oils."
+    },
+    "flux_remover": {
+      "name": "Flux remover",
+      "aka": [
+        "PCB cleaner",
+        "Defluxer",
+        "Electronics cleaner"
+      ],
+      "notes": "Typically a blend of IPA, ethanol, and/or ethyl acetate. Ratings based on MG Chemicals and Techspray IPA/ester-based flux remover formulations."
+    },
+    "brake_fluid_dot34": {
+      "name": "Brake fluid DOT3/4",
+      "aka": [
+        "DOT3",
+        "DOT4",
+        "Polyglycol brake fluid"
+      ],
+      "notes": "Polyglycol ether-based brake fluid. DOT3 and DOT4 have similar polymer compatibility; DOT5 (silicone-based) has a different profile and is not represented here."
+    },
+    "gasoline": {
+      "name": "Gasoline / Petrol",
+      "aka": [
+        "Petrol",
+        "Unleaded fuel",
+        "Aliphatic hydrocarbons"
+      ],
+      "notes": "Regular unleaded gasoline. Contains aliphatic and aromatic hydrocarbons including benzene, toluene, and xylene fractions."
+    },
+    "motor_oil": {
+      "name": "Motor oil",
+      "aka": [
+        "Engine oil",
+        "Mineral oil",
+        "Lubricating oil"
+      ],
+      "notes": "Conventional mineral-base motor oil (SAE 5W-30 / 10W-40 type). Synthetic variants may vary."
+    },
+    "naoh_10": {
+      "name": "NaOH lye 10%",
+      "aka": [
+        "Sodium hydroxide",
+        "Lye",
+        "Caustic soda"
+      ],
+      "notes": "10% w/v sodium hydroxide solution. Strong alkali; used in some support removal processes and industrial cleaning."
+    },
+    "ca_glue": {
+      "name": "CA glue",
+      "aka": [
+        "Cyanoacrylate",
+        "Super Glue",
+        "Krazy Glue",
+        "Ethyl 2-cyanoacrylate"
+      ],
+      "notes": "Ethyl cyanoacrylate adhesive. Ratings reflect brief contact / bonding exposure rather than prolonged immersion."
+    }
+  },
+  "references": {
+    "prusament_2021": {
+      "title": "Chemical Resistance of 3D Printing Materials",
+      "authors": "Prusa Research",
+      "year": 2021,
+      "url": "https://prusament.com/chemical-resistance-of-3d-printing-materials/",
+      "notes": "7-day laboratory immersion study. Weight and dimensional change measured. Covers PLA, PVB, PETG, ASA, ABS, PC, PA, PP. Primary and most rigorous source in this dataset."
+    },
+    "forerunner_tpu_2025": {
+      "title": "ESTANE M95A TPU Chemical Compatibility — 4-Week Immersion Test",
+      "authors": "Forerunner 3D",
+      "year": 2025,
+      "url": "https://forerunner3d.com/",
+      "notes": "4-week immersion test for TPU 95A. Ratings mapped from 1–4 scale to A–D."
+    },
+    "ultimaker_tpu_tds": {
+      "title": "Ultimaker TPU 95A Technical Data Sheet",
+      "authors": "UltiMaker",
+      "year": 2023,
+      "url": "https://ultimaker.com/learn/chemical-resistant-materials-a-beginners-guide/",
+      "notes": "TDS for UltiMaker TPU 95A. Selected chemical exposure ratings."
+    },
+    "basf_elastollan": {
+      "title": "Elastollan Chemical Resistance Properties",
+      "authors": "BASF",
+      "year": 2022,
+      "url": "https://www.basf.com/global/en/products/tags-e/elastollan.html",
+      "notes": "Chemical resistance data for BASF Elastollan TPU polyurethane family. Covers acids, solvents, bases, and oils."
+    },
+    "smithmetal_pa12": {
+      "title": "Engineering Plastic Nylon 12 (PA12) Data Sheet",
+      "authors": "Smiths Metal Centres",
+      "year": 2020,
+      "url": "https://www.smithmetal.com/pdf/plastics/nylon-12.pdf",
+      "notes": "Chemical resistance table for PA12 stock material."
+    },
+    "filamentek_pa12": {
+      "title": "PA12 Chemical Resistance Chart",
+      "authors": "Filamentek",
+      "year": 2023,
+      "url": "https://filamentek.hu/wp-content/uploads/2023/01/00fb2d54630b8f62e3f14f1dfd7b6a63_pa-12-chemical-resistance-chart.pdf",
+      "notes": "PA12 filament chemical resistance chart. Used to corroborate smithmetal_pa12 ratings."
+    },
+    "kmac_pom": {
+      "title": "Acetal (POM) Chemical Resistance Data Sheet",
+      "authors": "K-Mac Plastics",
+      "year": 2021,
+      "url": "http://k-mac-plastics.com/data-sheets/acetal_chemical_resistant_chart.htm",
+      "notes": "Broad chemical compatibility chart for acetal/POM stock. Used for POM ratings."
+    },
+    "ism_pom": {
+      "title": "Acetal (POM) Chemical Compatibility Chart",
+      "authors": "Industrial Spec (ISM)",
+      "year": 2020,
+      "url": "https://www.industrialspec.com/images/files/acetal-pom-chemical-compatibility-chart-from-ism.pdf",
+      "notes": "Secondary POM compatibility source. Used to cross-check kmac_pom ratings."
+    },
+    "kmac_petg": {
+      "title": "PETG Chemical Resistance Data Sheet",
+      "authors": "K-Mac Plastics",
+      "year": 2021,
+      "url": "https://kmac-plastics.net/data/chemical/petg-chemical.htm",
+      "notes": "PETG stock material chemical resistance. Used for supplemental PETG ratings beyond Prusament scope."
+    },
+    "kmac_hips": {
+      "title": "HIPS Chemical Resistance Data (K-Mac reference)",
+      "authors": "K-Mac Plastics",
+      "year": 2021,
+      "url": "http://k-mac-plastics.com/",
+      "notes": "HIPS chemical resistance reference. Used alongside simplify3d_guide for HIPS ratings."
+    },
+    "simplify3d_guide": {
+      "title": "Ultimate 3D Printing Materials Guide",
+      "authors": "Simplify3D",
+      "year": 2019,
+      "url": "https://www.simplify3d.com/resources/materials-guide/",
+      "notes": "General material properties and chemical susceptibility for FDM filaments including HIPS. Used for solvent behaviour of styrene-based polymers."
+    },
+    "graco_compat": {
+      "title": "Chemical Compatibility Guide",
+      "authors": "Graco",
+      "year": 2024,
+      "url": "https://www.graco.com/content/dam/graco/ipd/literature/misc/chemical-compatibility-guide/Graco_ChemCompGuideEN-D.pdf",
+      "notes": "Broad plastics and elastomers chemical compatibility guide. Used for supplemental ratings on oils, alkalis, and new chemicals across multiple materials."
+    },
+    "mg_chemicals_tds": {
+      "title": "Flux Remover / PCB Cleaner Technical Data Sheets",
+      "authors": "MG Chemicals",
+      "year": 2025,
+      "url": "https://mgchemicals.com/products/soldering-supplies/flux-removers/",
+      "notes": "Solvent composition data for IPA/ethanol/ethyl acetate-based flux removers. Used to assess flux remover aggressiveness toward filament materials."
+    },
+    "reddit_brakefluid_2023": {
+      "title": "Brake fluid effects on PETG and ABS — community immersion reports",
+      "authors": "r/3Dprinting community",
+      "year": 2023,
+      "url": "https://www.reddit.com/r/3Dprinting/comments/158iuqk/brake_fluid_effects_on_petg_and_abs/",
+      "notes": "Community immersion observations for brake fluid on ABS and PETG. Low-confidence source; used only where no TDS data was available. Corroborated by general_chem."
+    },
+    "pubmed_2025": {
+      "title": "Investigation of the Effect of Exposure to Liquid Chemicals on the Strength Performance of 3D-Printed Parts",
+      "authors": "PMC / PubMed",
+      "year": 2025,
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12196949/",
+      "notes": "Peer-reviewed study on chemical exposure effects on FDM printed parts. Used for cross-referencing chemical attack mechanisms."
+    },
+    "general_chem": {
+      "title": "General polymer chemistry knowledge",
+      "authors": null,
+      "year": null,
+      "url": null,
+      "notes": "Ratings inferred from known polymer chemistry principles — solubility parameters, functional group reactivity, and plasticizer theory. No single citable source. Lowest confidence tier; used only when no TDS or immersion data was available."
+    }
+  }
+};
 
-// col index in ROWS[i]: name=0,formula=1, then mat values at 2..13, tpu_conf=14
-// MATS order: ABS=0,ASA=1,HIPS=2,PA=3,PA12=4,PC=5,PETG=6,PLA=7,POM=8,PP=9,PVB=10,TPU=11
+// ── Derived display order (alphabetical by material name) ─────────────────
+const MAT_KEYS = Object.keys(DATA.materials).sort((a,b) =>
+  DATA.materials[a]._meta.name.localeCompare(DATA.materials[b]._meta.name));
 
-const ratingOrder = {'A':0,'B':1,'C':2,'D':3};
-function rc(v){ return (!v||v==='-')?'r_':'r'+v; }
-function lbl(v){ return (!v||v==='-')?'\u2013':v; }
+const CHEM_KEYS = Object.keys(DATA.chemicals);
+const RATING_ORD = {A:0,B:1,C:2,D:3};
+
 function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function esc(s){ return s ? s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function getRating(matKey, chemKey){
+  return DATA.materials[matKey]?.chemicals?.[chemKey] || null;
+}
+function chipClass(r){ return r && r!=='-' ? 'r'+r : 'r_'; }
+function chipLabel(r){ return (r && r!=='-') ? r : '\u2013'; }
 
-// ── Build header ──────────────────────────────────────────────────────────────
+// ── Build header ──────────────────────────────────────────────────────────
 const headerRow = document.getElementById('headerRow');
 const hiddenCols = new Set();
 
-MATS.forEach((m, ci) => {
+MAT_KEYS.forEach((mk, ci) => {
   const th = document.createElement('th');
-  th.textContent = m;
   th.dataset.ci = ci;
-  th.innerHTML = m + ' <span class="sort-icon"></span>';
+  th.innerHTML = DATA.materials[mk]._meta.name + ' <span class="si"></span>';
   th.addEventListener('click', () => sortByCol(ci));
   headerRow.appendChild(th);
 });
 
-// ── Build body ────────────────────────────────────────────────────────────────
+// ── Build reference list ──────────────────────────────────────────────────
+const refList = document.getElementById('refList');
+// Build stable 1-based index for all reference slugs
+const REF_INDEX = {};
+Object.keys(DATA.references).forEach((slug, i) => { REF_INDEX[slug] = i + 1; });
+
+Object.entries(DATA.references).forEach(([slug, ref], i) => {
+  const li = document.createElement('li');
+  li.id = 'ref-' + slug;
+  const num = i + 1;
+  const link = ref.url
+    ? `<a href="${ref.url}" target="_blank" rel="noopener">${esc(ref.title)}</a>`
+    : esc(ref.title);
+  const year = ref.year ? ` (${ref.year})` : '';
+  const authors = ref.authors ? ` — ${esc(ref.authors)}` : '';
+  li.innerHTML = `<span class="ref-num">[${num}]</span>` + link + year + authors;
+  refList.appendChild(li);
+});
+
+// ── Render table ──────────────────────────────────────────────────────────
 const tbody = document.getElementById('tbody');
-let currentSort = null; // {ci, dir}
+let sortedChemKeys = [...CHEM_KEYS];
+let currentSort = null;
 
-function buildRows(data) {
+function buildRows(chemOrder) {
   tbody.innerHTML = '';
-  data.forEach((row, ri) => {
+  chemOrder.forEach(ck => {
+    const chem = DATA.chemicals[ck];
+    if (!chem) return;
     const tr = document.createElement('tr');
-    tr.dataset.ri = ri;
+    tr.dataset.ck = ck;
 
+    // Chemical name cell
     const td0 = document.createElement('td');
-    td0.className = 'chem';
-    td0.innerHTML = row[0] + '<span class="formula">' + row[1] + '</span>';
+    td0.className = 'chem-cell';
+    const aka = (chem.aka || []).join(', ');
+    td0.innerHTML = esc(chem.name) + (aka ? `<span class="fml">${esc(aka)}</span>` : '');
+    if (chem.notes) td0.title = chem.notes;
     tr.appendChild(td0);
 
-    MATS.forEach((mat, ci) => {
-      const val = row[ci + 2];
+    // Rating cells
+    MAT_KEYS.forEach((mk, ci) => {
+      const entry = getRating(mk, ck);
+      const rating = entry?.rating || null;
+      const r = (rating && rating !== '-') ? rating : null;
+
       const td = document.createElement('td');
-      td.className = 'r ' + rc(val);
+      td.className = 'r ' + chipClass(rating);
       td.dataset.ci = ci;
+      if (entry?.confidence) td.dataset.conf = entry.confidence;
       if (hiddenCols.has(ci)) td.classList.add('col-hidden');
-      const hasTip = (val==='C'||val==='D') && TIPS[row[0]+'|'+mat];
+
+      const hasTip = (r === 'C' || r === 'D') && entry?.tip;
       if (hasTip) {
         td.classList.add('has-tip');
         td.tabIndex = 0;
         td.setAttribute('role','button');
-        const openTip = (e) => {
+        const open = e => {
           e.stopPropagation();
           if (activeCell === td) { hideTip(); return; }
           hideTip(); activeCell = td; td.classList.add('active');
           const rect = td.getBoundingClientRect();
-          showTip(row[0], mat, val, rect.right, rect.top + rect.height/2);
+          showTip(chem.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2);
         };
-        td.addEventListener('click', openTip);
-        td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openTip(e); } });
+        td.addEventListener('click', open);
+        td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(e); }});
+        td.addEventListener('mouseleave', () => { if(activeCell===td) scheduledHide(); });
       }
-      td.innerHTML = '<span class="chip">' + lbl(val) + '</span>';
+      td.innerHTML = `<span class="chip">${chipLabel(rating)}</span>`;
       tr.appendChild(td);
     });
-
     tbody.appendChild(tr);
   });
   applyFilters();
-  if (document.getElementById('filterBest').checked) highlightBest();
+  if (document.getElementById('filterBest').checked) markBest();
 }
 
-buildRows(ROWS);
+buildRows(sortedChemKeys);
 
-// ── Tooltip ───────────────────────────────────────────────────────────────────
-const tipbox = document.getElementById('tipbox');
-const tipHeader = document.getElementById('tipHeader');
-const tipRating = document.getElementById('tipRating');
-const tipText = document.getElementById('tipText');
+// ── Column toggles ────────────────────────────────────────────────────────
+const matToggleRow = document.getElementById('matToggleRow');
+MAT_KEYS.forEach((mk, ci) => {
+  const btn = document.createElement('button');
+  btn.textContent = DATA.materials[mk]._meta.name;
+  btn.dataset.ci = ci;
+  btn.addEventListener('click', () => {
+    if (hiddenCols.has(ci)) { hiddenCols.delete(ci); btn.classList.remove('hidden-col'); }
+    else { hiddenCols.add(ci); btn.classList.add('hidden-col'); }
+    document.querySelectorAll(`[data-ci="${ci}"]`).forEach(el => el.classList.toggle('col-hidden', hiddenCols.has(ci)));
+  });
+  matToggleRow.appendChild(btn);
+});
+document.getElementById('showAllBtn').addEventListener('click', () => {
+  hiddenCols.clear();
+  matToggleRow.querySelectorAll('button').forEach(b => b.classList.remove('hidden-col'));
+  document.querySelectorAll('.col-hidden').forEach(el => el.classList.remove('col-hidden'));
+});
+
+// ── Filters ───────────────────────────────────────────────────────────────
+function applyFilters() {
+  const cdOnly = document.getElementById('filterCD').checked;
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  tbody.querySelectorAll('tr').forEach(tr => {
+    const ck = tr.dataset.ck;
+    const chem = DATA.chemicals[ck];
+    const name = (chem?.name || '').toLowerCase();
+    const aka  = (chem?.aka || []).join(' ').toLowerCase();
+    const matchQ = !q || name.includes(q) || aka.includes(q);
+    if (!matchQ) { tr.classList.add('row-hidden'); tr.classList.remove('hl'); return; }
+    if (cdOnly) {
+      const hasCD = MAT_KEYS.some(mk => { const r = getRating(mk,ck)?.rating; return r==='C'||r==='D'; });
+      tr.classList.toggle('row-hidden', !hasCD);
+    } else {
+      tr.classList.remove('row-hidden');
+    }
+    tr.classList.toggle('hl', !!q);
+  });
+}
+document.getElementById('filterCD').addEventListener('change', applyFilters);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('filterBest').addEventListener('change', () => {
+  document.getElementById('filterBest').checked ? markBest() : clearBest();
+});
+
+function markBest() {
+  clearBest();
+  tbody.querySelectorAll('tr:not(.row-hidden)').forEach(tr => {
+    const cells = Array.from(tr.querySelectorAll('td.r:not(.col-hidden)'));
+    let best = null, bestRank = 99;
+    cells.forEach(td => {
+      const v = td.querySelector('.chip')?.textContent.trim();
+      const rank = RATING_ORD[v] ?? 99;
+      if (rank < bestRank) { bestRank = rank; best = td; }
+    });
+    if (best) best.classList.add('best-col');
+  });
+}
+function clearBest() { tbody.querySelectorAll('.best-col').forEach(td => td.classList.remove('best-col')); }
+
+// ── Sort by material column ───────────────────────────────────────────────
+function sortByCol(ci) {
+  const ths = Array.from(headerRow.querySelectorAll('th'));
+  ths.forEach(th => th.classList.remove('sort-asc','sort-desc'));
+  const mk = MAT_KEYS[ci];
+  if (currentSort?.ci===ci && currentSort.dir==='asc') {
+    currentSort = {ci, dir:'desc'}; ths[ci+1].classList.add('sort-desc');
+  } else {
+    currentSort = {ci, dir:'asc'}; ths[ci+1].classList.add('sort-asc');
+  }
+  sortedChemKeys = [...CHEM_KEYS].sort((a,b) => {
+    const ar = RATING_ORD[getRating(mk,a)?.rating] ?? 99;
+    const br = RATING_ORD[getRating(mk,b)?.rating] ?? 99;
+    return currentSort.dir==='asc' ? ar-br : br-ar;
+  });
+  buildRows(sortedChemKeys);
+}
+
+// ── Tooltip ───────────────────────────────────────────────────────────────
+const tipbox   = document.getElementById('tipbox');
+const tipHdr   = document.getElementById('tipHdr');
+const tipRating= document.getElementById('tipRating');
+const tipBody  = document.getElementById('tipBody');
+const tipRefs  = document.getElementById('tipRefs');
 let activeCell = null;
 
-function showTip(chem, mat, rating, x, y) {
-  const desc = TIPS[chem+'|'+mat];
-  if (!desc) return;
+function showTip(chemName, matName, rating, entry, x, y) {
   tipbox.className = 'tipbox visible r'+rating;
-  tipHeader.textContent = chem + ' — ' + mat;
-  tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% or destroyed)');
-  tipText.textContent = desc;
-  const pw=255,ph=130,vw=window.innerWidth,vh=window.innerHeight;
+  tipHdr.textContent = chemName + ' — ' + matName;
+  tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% / destroyed)');
+  tipBody.textContent = entry.tip || '';
+
+  // Build clickable, numbered source links
+  tipRefs.innerHTML = '';
+  const refs = entry.references || [];
+  if (refs.length) {
+    const prefix = document.createTextNode('Sources: ');
+    tipRefs.appendChild(prefix);
+    refs.forEach((slug, i) => {
+      const r = DATA.references[slug];
+      const num = REF_INDEX[slug] || '?';
+      const label = r ? (r.authors ? r.authors + (r.year ? ' ' + r.year : '') : r.title) : slug;
+      const a = document.createElement('a');
+      a.textContent = label + ' [' + num + ']';
+      a.href = '#ref-' + slug;
+      a.dataset.refSlug = slug;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        hideTip();
+        highlightRef(slug);
+      });
+      tipRefs.appendChild(a);
+      if (i < refs.length - 1) tipRefs.appendChild(document.createTextNode('; '));
+    });
+  }
+
+  const pw=268,ph=160,vw=window.innerWidth,vh=window.innerHeight;
   let tx=x+12,ty=y-10;
   if(tx+pw>vw-8) tx=x-pw-12;
   if(ty+ph>vh-8) ty=vh-ph-8;
   if(ty<8) ty=8;
   tipbox.style.left=tx+'px'; tipbox.style.top=ty+'px';
 }
-function hideTip() {
-  tipbox.classList.remove('visible');
-  if(activeCell){ activeCell.classList.remove('active'); activeCell=null; }
+
+function highlightRef(slug) {
+  const li = document.getElementById('ref-' + slug);
+  if (!li) return;
+  // Scroll into view only if not already visible
+  const rect = li.getBoundingClientRect();
+  const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+  if (!inView) li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Flash highlight
+  li.classList.remove('ref-highlight');
+  void li.offsetWidth; // force reflow to restart animation
+  li.classList.add('ref-highlight');
+  li.addEventListener('animationend', () => li.classList.remove('ref-highlight'), { once: true });
 }
-document.addEventListener('click', e => { if(!tipbox.contains(e.target)&&!(activeCell&&activeCell.contains(e.target))) hideTip(); });
+let tipHideTimer = null;
+
+function hideTip() {
+  clearTimeout(tipHideTimer);
+  tipbox.classList.remove('visible');
+  if (activeCell) { activeCell.classList.remove('active'); activeCell=null; }
+}
+function scheduledHide() {
+  tipHideTimer = setTimeout(hideTip, 180);
+}
+function cancelHide() {
+  clearTimeout(tipHideTimer);
+}
+
+// Keep tooltip open while mouse is over it
+tipbox.addEventListener('mouseenter', cancelHide);
+tipbox.addEventListener('mouseleave', scheduledHide);
+
+document.addEventListener('click', e => {
+  if (!tipbox.contains(e.target) && !(activeCell?.contains(e.target))) hideTip();
+});
 document.addEventListener('keydown', e => { if(e.key==='Escape') hideTip(); });
 
-// ── Filters ───────────────────────────────────────────────────────────────────
-function applyFilters() {
-  const cdOnly = document.getElementById('filterCD').checked;
-  const q = document.getElementById('searchInput').value.trim().toLowerCase();
-  Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-    const chem = tr.querySelector('td.chem');
-    const name = chem ? chem.childNodes[0].textContent.toLowerCase() : '';
-    const formula = chem ? (chem.querySelector('.formula')||{}).textContent?.toLowerCase()||'' : '';
-    const matchSearch = !q || name.includes(q) || formula.includes(q);
-    if (!matchSearch) { tr.classList.add('row-hidden'); return; }
-    if (cdOnly) {
-      const vals = Array.from(tr.querySelectorAll('td.r')).map(td => td.querySelector('.chip')?.textContent.trim());
-      const hasCD = vals.some(v => v==='C'||v==='D');
-      tr.classList.toggle('row-hidden', !hasCD);
-    } else {
-      tr.classList.remove('row-hidden');
-    }
-    tr.classList.toggle('row-highlight', !!q && matchSearch);
-  });
-}
-
-document.getElementById('filterCD').addEventListener('change', applyFilters);
-document.getElementById('searchInput').addEventListener('input', applyFilters);
-document.getElementById('filterBest').addEventListener('change', () => {
-  if(document.getElementById('filterBest').checked) highlightBest(); else clearBest();
-});
-
-function highlightBest() {
-  Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
-    const cells = Array.from(tr.querySelectorAll('td.r'));
-    let best = null, bestRank = 99;
-    cells.forEach(td => {
-      const v = td.querySelector('.chip')?.textContent.trim();
-      const rank = ratingOrder[v] ?? 99;
-      if(rank < bestRank){ bestRank=rank; best=td; }
-    });
-    if(best) best.classList.add('best-col');
-  });
-}
-function clearBest() {
-  tbody.querySelectorAll('.best-col').forEach(td => td.classList.remove('best-col'));
-}
-
-// ── Column toggles ────────────────────────────────────────────────────────────
-const matToggles = document.getElementById('matToggles');
-MATS.forEach((m, ci) => {
-  const btn = document.createElement('button');
-  btn.textContent = m;
-  btn.title = 'Toggle '+m;
-  btn.dataset.ci = ci;
-  btn.addEventListener('click', () => {
-    if(hiddenCols.has(ci)){ hiddenCols.delete(ci); btn.style.opacity='1'; btn.style.textDecoration='none'; }
-    else{ hiddenCols.add(ci); btn.style.opacity='0.4'; btn.style.textDecoration='line-through'; }
-    document.querySelectorAll('[data-ci="'+ci+'"]').forEach(el => el.classList.toggle('col-hidden',hiddenCols.has(ci)));
-  });
-  matToggles.appendChild(btn);
-});
-document.getElementById('showAllMats').addEventListener('click', () => {
-  hiddenCols.clear();
-  matToggles.querySelectorAll('button').forEach(btn => { btn.style.opacity='1'; btn.style.textDecoration='none'; });
-  document.querySelectorAll('.col-hidden').forEach(el => el.classList.remove('col-hidden'));
-});
-
-// ── Sort by column ────────────────────────────────────────────────────────────
-function sortByCol(ci) {
-  const ths = Array.from(headerRow.querySelectorAll('th'));
-  ths.forEach(th => th.classList.remove('sort-asc','sort-desc'));
-  if(currentSort && currentSort.ci===ci && currentSort.dir==='asc') {
-    currentSort = {ci, dir:'desc'};
-    ths[ci+1].classList.add('sort-desc');
-  } else {
-    currentSort = {ci, dir:'asc'};
-    ths[ci+1].classList.add('sort-asc');
-  }
-  const sorted = [...ROWS].sort((a,b) => {
-    const av = a[ci+2], bv = b[ci+2];
-    const ar = ratingOrder[av]??99, br = ratingOrder[bv]??99;
-    return currentSort.dir==='asc' ? ar-br : br-ar;
-  });
-  buildRows(sorted);
-}
-
-// ── Theme toggle ──────────────────────────────────────────────────────────────
+// ── Theme toggle ──────────────────────────────────────────────────────────
 (function(){
-  const btn = document.getElementById('themeBtn');
-  const root = document.documentElement;
-  let dark = false;
-  btn.addEventListener('click', () => {
-    dark = !dark;
-    root.setAttribute('data-theme', dark?'dark':'light');
+  const btn=document.getElementById('themeBtn'), root=document.documentElement;
+  let dark=false;
+  btn.addEventListener('click',()=>{
+    dark=!dark; root.setAttribute('data-theme',dark?'dark':'light');
     btn.innerHTML = dark
-      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Dark'
-      : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg> Light';
+      ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Dark'
+      : '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg> Light';
   });
 })();
 
-// ── SVG/PNG Export ────────────────────────────────────────────────────────────
-function buildExportSVG() {
-  const SCALE = 1;
-  const COL_CHEM = 190, COL_W = 56, ROW_H = 32, PAD = 14, HEADER_H = 36;
-  const CHIP_W = 34, CHIP_H = 20, CHIP_R = 4, FOOT_H = 105;
-
-  const visibleMats = MATS.filter((_,ci) => !hiddenCols.has(ci));
-  const visibleCols = MATS.map((_,ci) => ci).filter(ci => !hiddenCols.has(ci));
-  const visibleRows = Array.from(tbody.querySelectorAll('tr:not(.row-hidden)')).map(tr => {
-    const ri = parseInt(tr.dataset.ri);
-    return ROWS[ri] || null;
-  }).filter(Boolean);
-
-  const nCols = visibleMats.length;
-  const nRows = visibleRows.length;
-  const totalW = PAD*2 + COL_CHEM + nCols * COL_W;
-  const totalH = PAD + HEADER_H + nRows * ROW_H + PAD + FOOT_H + PAD;
-
-  const colors = {
-    bg:cssVar('--bg'),surface:cssVar('--surface'),surface2:cssVar('--surface2'),
-    border:cssVar('--border'),divider:cssVar('--divider'),
-    text:cssVar('--text'),muted:cssVar('--muted'),faint:cssVar('--faint'),
-  };
-  function chipClr(r){
-    if(r==='A') return [cssVar('--A-bg'),cssVar('--A-fg')];
-    if(r==='B') return [cssVar('--B-bg'),cssVar('--B-fg')];
-    if(r==='C') return [cssVar('--C-bg'),cssVar('--C-fg')];
-    if(r==='D') return [cssVar('--D-bg'),cssVar('--D-fg')];
-    return [cssVar('--none-bg'),cssVar('--none-fg')];
-  }
-  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  const cardX=PAD, cardY=PAD, cardW=totalW-PAD*2, cardH=HEADER_H+nRows*ROW_H;
-  let s='';
-  s+=`<rect width="${totalW}" height="${totalH}" fill="${colors.bg}"/>`;
-  s+=`<rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="10" fill="${colors.surface}" stroke="${colors.border}" stroke-width="1"/>`;
-  s+=`<rect x="${cardX}" y="${cardY}" width="${cardW}" height="${HEADER_H}" rx="10" fill="${colors.surface2}"/>`;
-  s+=`<rect x="${cardX}" y="${cardY+HEADER_H-8}" width="${cardW}" height="8" fill="${colors.surface2}"/>`;
-  s+=`<line x1="${cardX}" y1="${cardY+HEADER_H}" x2="${cardX+cardW}" y2="${cardY+HEADER_H}" stroke="${colors.border}" stroke-width="1.5"/>`;
-  s+=`<text x="${cardX+PAD}" y="${cardY+HEADER_H/2+4}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="600" fill="${colors.muted}">Chemical</text>`;
-  visibleMats.forEach((m,di)=>{
-    const cx=cardX+COL_CHEM+di*COL_W+COL_W/2;
-    s+=`<text x="${cx}" y="${cardY+HEADER_H/2+4}" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="${colors.muted}">${esc(m)}</text>`;
+// ── SVG/PNG Export (reads live table state) ───────────────────────────────
+function buildExportSVG(){
+  const CC=185,CW=54,RH=31,PAD=13,HH=35,CW2=32,CH=19,CR=4,FOOT=100;
+  const visMats=MAT_KEYS.filter((_,ci)=>!hiddenCols.has(ci));
+  const visChems=sortedChemKeys.filter(ck=>DATA.chemicals[ck]);
+  const visRows=visChems.filter(ck=>{
+    const tr=tbody.querySelector(`tr[data-ck="${ck}"]`);
+    return tr && !tr.classList.contains('row-hidden');
   });
-
-  visibleRows.forEach((row,ri)=>{
-    const ry=cardY+HEADER_H+ri*ROW_H;
-    if(ri>0) s+=`<line x1="${cardX+1}" y1="${ry}" x2="${cardX+cardW-1}" y2="${ry}" stroke="${colors.divider}" stroke-width="0.6"/>`;
-    const textY=ry+ROW_H/2-2;
-    s+=`<text x="${cardX+PAD}" y="${textY}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="500" fill="${colors.text}">${esc(row[0])}</text>`;
-    s+=`<text x="${cardX+PAD}" y="${textY+10}" font-family="monospace" font-size="7" fill="${colors.faint}">${esc(row[1])}</text>`;
-    visibleCols.forEach((ci,di)=>{
-      const val=row[ci+2];
-      const [bg,fg]=chipClr(val==='–'?null:val);
-      const cx=cardX+COL_CHEM+di*COL_W+COL_W/2;
-      const cy=ry+ROW_H/2;
-      s+=`<rect x="${cx-CHIP_W/2}" y="${cy-CHIP_H/2}" width="${CHIP_W}" height="${CHIP_H}" rx="${CHIP_R}" fill="${bg}"/>`;
-      s+=`<text x="${cx}" y="${cy+4.5}" text-anchor="middle" font-family="monospace" font-size="9.5" font-weight="700" fill="${fg}">${esc(lbl(val))}</text>`;
+  const nC=visMats.length,nR=visRows.length;
+  const W=PAD*2+CC+nC*CW,H=PAD+HH+nR*RH+PAD+FOOT+PAD;
+  function cv(n){return cssVar(n);}
+  function chipC(r){
+    if(r==='A')return[cv('--A-bg'),cv('--A-fg')];
+    if(r==='B')return[cv('--B-bg'),cv('--B-fg')];
+    if(r==='C')return[cv('--C-bg'),cv('--C-fg')];
+    if(r==='D')return[cv('--D-bg'),cv('--D-fg')];
+    return[cv('--none-bg'),cv('--none-fg')];
+  }
+  const cX=PAD,cY=PAD,cW=W-PAD*2,cH=HH+nR*RH;
+  let s='';
+  s+=`<rect width="${W}" height="${H}" fill="${cv('--bg')}"/>`;
+  s+=`<rect x="${cX}" y="${cY}" width="${cW}" height="${cH}" rx="10" fill="${cv('--surface')}" stroke="${cv('--border')}" stroke-width="1"/>`;
+  s+=`<rect x="${cX}" y="${cY}" width="${cW}" height="${HH}" rx="10" fill="${cv('--surface2')}"/>`;
+  s+=`<rect x="${cX}" y="${cY+HH-8}" width="${cW}" height="8" fill="${cv('--surface2')}"/>`;
+  s+=`<line x1="${cX}" y1="${cY+HH}" x2="${cX+cW}" y2="${cY+HH}" stroke="${cv('--border')}" stroke-width="1.5"/>`;
+  s+=`<text x="${cX+PAD}" y="${cY+HH/2+4}" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="600" fill="${cv('--muted')}">Chemical</text>`;
+  visMats.forEach((mk,di)=>{
+    const cx=cX+CC+di*CW+CW/2;
+    s+=`<text x="${cx}" y="${cY+HH/2+4}" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" font-weight="700" fill="${cv('--muted')}">${esc(DATA.materials[mk]._meta.name)}</text>`;
+  });
+  visRows.forEach((ck,ri)=>{
+    const ry=cY+HH+ri*RH;
+    if(ri>0) s+=`<line x1="${cX+1}" y1="${ry}" x2="${cX+cW-1}" y2="${ry}" stroke="${cv('--divider')}" stroke-width="0.6"/>`;
+    const chem=DATA.chemicals[ck];
+    const ty=ry+RH/2-2;
+    s+=`<text x="${cX+PAD}" y="${ty}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="500" fill="${cv('--text')}">${esc(chem.name)}</text>`;
+    const aka=(chem.aka||[])[0]||'';
+    if(aka) s+=`<text x="${cX+PAD}" y="${ty+10}" font-family="monospace" font-size="6.5" fill="${cv('--faint')}">${esc(aka)}</text>`;
+    visMats.forEach((mk,di)=>{
+      const entry=getRating(mk,ck);
+      const rating=entry?.rating||null;
+      const[bg,fg]=chipC(rating);
+      const cx=cX+CC+di*CW+CW/2,cy=ry+RH/2;
+      s+=`<rect x="${cx-CW2/2}" y="${cy-CH/2}" width="${CW2}" height="${CH}" rx="${CR}" fill="${bg}"/>`;
+      s+=`<text x="${cx}" y="${cy+4.5}" text-anchor="middle" font-family="monospace" font-size="9" font-weight="700" fill="${fg}">${esc(chipLabel(rating))}</text>`;
     });
   });
-
-  const footY=cardY+cardH+14;
-  [['A','<1% change'],['B','2–3% change'],['C','4–5% change'],['D','>5% / destroyed']].forEach(([r,desc],i)=>{
+  const fy=cY+cH+13;
+  [['A','<1%'],['B','2–3%'],['C','4–5%'],['D','>5%']].forEach(([r,d],i)=>{
     const col=i%2,row=Math.floor(i/2);
-    const fx=cardX+col*(cardW/2),fy=footY+row*20;
-    const [bg,fg]=chipClr(r);
-    s+=`<rect x="${fx}" y="${fy}" width="20" height="15" rx="3" fill="${bg}"/>`;
-    s+=`<text x="${fx+10}" y="${fy+11}" text-anchor="middle" font-family="monospace" font-size="8.5" font-weight="700" fill="${fg}">${r}</text>`;
-    s+=`<text x="${fx+26}" y="${fy+11}" font-family="Inter,Arial,sans-serif" font-size="8" fill="${colors.muted}">${esc(r==='A'?'Resists very well ('+desc+')':r==='B'?'Moderate ('+desc+')':r==='C'?'Resists poorly ('+desc+')':'Does not resist ('+desc+')')}</text>`;
+    const fx=cX+col*(cW/2),ffy=fy+row*19;
+    const[bg,fg]=chipC(r);
+    s+=`<rect x="${fx}" y="${ffy}" width="19" height="14" rx="3" fill="${bg}"/>`;
+    s+=`<text x="${fx+9.5}" y="${ffy+10.5}" text-anchor="middle" font-family="monospace" font-size="8" font-weight="700" fill="${fg}">${r}</text>`;
+    const labels={A:'Resists very well',B:'Moderate',C:'Resists poorly',D:'Does not resist'};
+    s+=`<text x="${fx+25}" y="${ffy+10.5}" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="${cv('--muted')}">${esc(labels[r])} (${d})</text>`;
   });
-  const sy=footY+46;
-  s+=`<text x="${cardX}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="7" fill="${colors.faint}">Sources: Prusament (2021) + Forerunner 3D / UltiMaker / BASF / K-Mac / ISM / MG Chemicals TDS data. * Fridex=ethylene glycol ** Savo=NaClO † Flux remover=IPA/EtOH/ethyl acetate blend †† DOT3/4=polyglycol ether</text>`;
-  s+=`<text x="${cardX}" y="${sy+11}" font-family="Inter,Arial,sans-serif" font-size="7" fill="${colors.faint}">Generated ${new Date().toLocaleDateString('en-CA')}. Tap C/D cells in interactive version for failure descriptions.</text>`;
-
-  return {svg:`<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">${s}</svg>`,w:totalW,h:totalH};
+  const sy=fy+44;
+  s+=`<text x="${cX}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="6.5" fill="${cv('--faint')}">Sources: Prusament (2021) lab immersion + BASF Elastollan / UltiMaker / K-Mac / Smith Metal / Graco / MG Chemicals TDS. Generated ${new Date().toLocaleDateString('en-CA')}.</text>`;
+  return{svg:`<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${s}</svg>`,W,H};
 }
 
 document.getElementById('exportSvgBtn').addEventListener('click',()=>{
-  const {svg} = buildExportSVG();
+  const{svg}=buildExportSVG();
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
   a.download='filament-chemical-resistance.svg'; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 });
-
 document.getElementById('exportPngBtn').addEventListener('click',()=>{
-  const {svg,w,h} = buildExportSVG();
-  const SCALE=2;
-  const img=new Image();
+  const{svg,W,H}=buildExportSVG();
+  const S=2,img=new Image();
   const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
   img.onload=()=>{
     const c=document.createElement('canvas');
-    c.width=w*SCALE; c.height=h*SCALE;
+    c.width=W*S; c.height=H*S;
     const ctx=c.getContext('2d');
-    ctx.scale(SCALE,SCALE); ctx.drawImage(img,0,0);
-    URL.revokeObjectURL(url);
+    ctx.scale(S,S); ctx.drawImage(img,0,0); URL.revokeObjectURL(url);
     c.toBlob(b=>{
       const a=document.createElement('a');
       a.href=URL.createObjectURL(b);
