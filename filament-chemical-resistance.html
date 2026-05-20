@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FDM Filament Chemical Resistance Chart</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root,[data-theme="light"]{
+  --bg:#f5f4f0;--surface:#ffffff;--surface2:#f7f7f4;--border:#d8d5cf;--divider:#ece9e3;
+  --text:#1a1916;--muted:#6b6a66;--faint:#b0aea8;
+  --A-bg:#cff2dc;--A-fg:#0c4421;
+  --B-bg:#e6f0c8;--B-fg:#384e0c;
+  --C-bg:#fde8bb;--C-fg:#7a4000;
+  --D-bg:#fdd4d0;--D-fg:#7a120d;
+  --none-bg:#edeae4;--none-fg:#aeaba4;
+  --tooltip-bg:#1a1916;--tooltip-text:#f0ede8;
+  --shadow:0 8px 40px rgba(0,0,0,0.10),0 2px 8px rgba(0,0,0,0.06);
+  --r:14px;
+}
+[data-theme="dark"]{
+  --bg:#141312;--surface:#1c1b19;--surface2:#222120;--border:#333130;--divider:#28271f;
+  --text:#ccc9c4;--muted:#78766f;--faint:#46443e;
+  --A-bg:#163324;--A-fg:#7ecf96;
+  --B-bg:#222f14;--B-fg:#b2cc60;
+  --C-bg:#362612;--C-fg:#edaa58;
+  --D-bg:#361615;--D-fg:#f08278;
+  --none-bg:#202018;--none-fg:#46443e;
+  --tooltip-bg:#f0ede8;--tooltip-text:#1a1916;
+  --shadow:0 8px 40px rgba(0,0,0,0.45),0 2px 8px rgba(0,0,0,0.30);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-font-smoothing:antialiased}
+body{min-height:100dvh;font-family:'Inter',system-ui,sans-serif;font-size:clamp(0.875rem,0.82rem+0.28vw,1rem);color:var(--text);background:var(--bg);padding:clamp(0.75rem,2.5vw,2rem)}
+
+/* HEADER */
+.hdr{max-width:1400px;margin:0 auto clamp(0.75rem,2vw,1.5rem);display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem;flex-wrap:wrap}
+.hdr-title{font-size:clamp(1rem,0.85rem+0.8vw,1.45rem);font-weight:700;letter-spacing:-0.025em;line-height:1.2}
+.hdr-sub{font-size:clamp(0.68rem,0.63rem+0.22vw,0.78rem);color:var(--muted);margin-top:0.25rem;max-width:70ch;line-height:1.5}
+.btn-row{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;flex-shrink:0}
+.tbtn{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.35rem 0.8rem;font-size:0.72rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:0.35rem;transition:background 150ms;white-space:nowrap}
+.tbtn:hover{background:var(--surface2)}
+
+/* CONTROLS */
+.controls{max-width:1400px;margin:0 auto 0.9rem;display:flex;flex-wrap:wrap;gap:0.5rem;align-items:center}
+.filter-group{display:flex;align-items:center;gap:0.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.72rem;color:var(--muted)}
+.filter-group label{cursor:pointer;display:flex;align-items:center;gap:0.3rem}
+.filter-group input[type=checkbox]{accent-color:var(--D-fg);width:13px;height:13px}
+.search-wrap{display:flex;align-items:center;gap:0.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.72rem}
+.search-wrap input{background:none;border:none;outline:none;font-size:0.72rem;color:var(--text);width:120px;font-family:inherit}
+.search-wrap input::placeholder{color:var(--faint)}
+.mat-toggle-wrap{display:flex;align-items:center;gap:0.4rem;background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:0.3rem 0.7rem;font-size:0.72rem;color:var(--muted)}
+.mat-toggle-wrap button{background:none;border:none;font-size:0.7rem;color:var(--muted);cursor:pointer;padding:0 0.25rem;border-radius:3px}
+.mat-toggle-wrap button:hover{background:var(--surface2)}
+.ctrl-sep{width:1px;height:1.2rem;background:var(--divider)}
+
+/* LEGEND */
+.legend{max-width:1400px;margin:0 auto 0.9rem;display:flex;flex-wrap:wrap;gap:0.4rem;align-items:center}
+.leg-item{display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--muted)}
+.leg-chip{display:inline-flex;align-items:center;justify-content:center;min-width:1.7rem;height:1.35rem;padding:0 0.3rem;border-radius:4px;font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:0.7rem}
+.leg-A{background:var(--A-bg);color:var(--A-fg)}
+.leg-B{background:var(--B-bg);color:var(--B-fg)}
+.leg-C{background:var(--C-bg);color:var(--C-fg)}
+.leg-D{background:var(--D-bg);color:var(--D-fg)}
+.leg-none{background:var(--none-bg);color:var(--none-fg)}
+.leg-sep{width:1px;height:1rem;background:var(--divider);margin:0 0.15rem}
+.leg-hint{display:flex;align-items:center;gap:0.3rem;font-size:0.7rem;color:var(--muted)}
+
+/* TABLE */
+.card{max-width:1400px;margin:0 auto;background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--border)}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;min-width:600px}
+thead th{padding:0.55rem 0.35rem;text-align:center;font-size:0.63rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border-bottom:2px solid var(--border);white-space:nowrap;background:var(--surface2);color:var(--muted);cursor:pointer;user-select:none;position:relative}
+thead th:first-child{text-align:left;padding-left:1rem;min-width:195px;font-size:0.75rem;text-transform:none;letter-spacing:0;font-weight:600;cursor:default}
+thead th:not(:first-child):hover{background:var(--divider)}
+thead th .sort-icon{opacity:0.35;margin-left:2px;font-size:0.6rem}
+thead th.sort-asc .sort-icon::after{content:'↑'}
+thead th.sort-desc .sort-icon::after{content:'↓'}
+thead th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'↕'}
+thead th.col-hidden{display:none}
+
+tbody tr{border-bottom:1px solid var(--divider);transition:background 120ms}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--surface2)}
+tbody tr.row-hidden{display:none}
+tbody tr.row-highlight td.chem{background:rgba(255,220,50,0.15)}
+
+td.chem{padding:0.45rem 0.5rem 0.45rem 1rem;font-size:0.8rem;font-weight:500;white-space:nowrap}
+td.chem .formula{display:block;font-family:'IBM Plex Mono',monospace;font-size:0.66rem;color:var(--faint);font-weight:400;margin-top:1px}
+td.chem.col-hidden{display:none}
+
+td.r{text-align:center;padding:0.32rem 0.25rem;min-width:52px}
+td.r .chip{display:inline-flex;align-items:center;justify-content:center;width:1.9rem;height:1.6rem;border-radius:5px;font-weight:700;font-family:'IBM Plex Mono',monospace;font-size:0.75rem;position:relative}
+td.r.rA .chip{background:var(--A-bg);color:var(--A-fg)}
+td.r.rB .chip{background:var(--B-bg);color:var(--B-fg)}
+td.r.rC .chip{background:var(--C-bg);color:var(--C-fg)}
+td.r.rD .chip{background:var(--D-bg);color:var(--D-fg)}
+td.r.r_ .chip{background:var(--none-bg);color:var(--none-fg);font-weight:400;font-size:0.8rem}
+td.r.col-hidden{display:none}
+td.r.has-tip{cursor:pointer}
+td.r.has-tip .chip::after{content:'';position:absolute;bottom:2px;right:2px;width:4px;height:4px;border-radius:50%;background:currentColor;opacity:0.4}
+td.r.has-tip:hover .chip,td.r.has-tip.active .chip{filter:brightness(1.07);outline:2px solid currentColor;outline-offset:2px}
+
+/* best-col highlight */
+td.r.best-col{outline:2px solid rgba(12,68,33,0.25);outline-offset:-2px;border-radius:5px}
+
+/* TOOLTIP */
+.tipbox{display:none;position:fixed;z-index:9999;max-width:255px;background:var(--tooltip-bg);color:var(--tooltip-text);border-radius:9px;padding:0.6rem 0.8rem;font-size:0.7rem;line-height:1.55;pointer-events:none;box-shadow:0 8px 28px rgba(0,0,0,0.28),0 2px 6px rgba(0,0,0,0.18)}
+.tipbox.visible{display:block}
+.tip-header{font-weight:700;font-size:0.68rem;letter-spacing:0.04em;text-transform:uppercase;opacity:0.6;margin-bottom:0.25rem}
+.tip-rating{display:inline-block;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:0.72rem;padding:0.1rem 0.4rem;border-radius:4px;margin-bottom:0.35rem}
+.tip-text{opacity:0.92}
+.tipbox.rC .tip-rating{background:var(--C-bg);color:var(--C-fg)}
+.tipbox.rD .tip-rating{background:var(--D-bg);color:var(--D-fg)}
+
+/* FOOTER */
+.panels{max-width:1400px;margin:1rem auto 0;display:grid;grid-template-columns:1fr 1fr;gap:0.9rem}
+@media(max-width:640px){.panels{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0.9rem 1rem}
+.panel h3{font-size:0.78rem;font-weight:700;margin-bottom:0.5rem;letter-spacing:-0.01em}
+.panel dl{display:grid;grid-template-columns:1.6rem 1fr;gap:0.28rem 0.5rem;align-items:baseline}
+.panel dt{display:inline-flex;align-items:center;justify-content:center;width:1.5rem;height:1.25rem;border-radius:4px;font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:0.7rem}
+.panel dd{font-size:0.7rem;color:var(--muted);line-height:1.5}
+.dtA{background:var(--A-bg);color:var(--A-fg)} .dtB{background:var(--B-bg);color:var(--B-fg)}
+.dtC{background:var(--C-bg);color:var(--C-fg)} .dtD{background:var(--D-bg);color:var(--D-fg)}
+.panel ul{padding-left:0.9rem;margin-top:0.1rem}
+.panel li{font-size:0.7rem;color:var(--muted);line-height:1.6;margin-bottom:0.12rem}
+
+@media print{
+  body{background:#fff;padding:0.5rem}
+  .hdr-sub,.btn-row,.controls,.legend,.panels{display:none}
+  .card{box-shadow:none;border:1px solid #ccc;border-radius:0}
+  thead th{font-size:7pt;padding:4px 3px}
+  td.chem{font-size:7.5pt;padding:3px 4px}
+  td.r .chip{width:1.5rem;height:1.3rem;font-size:7.5pt}
+  td.chem .formula{font-size:6pt}
+  @page{size:landscape;margin:8mm}
+}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div>
+    <div class="hdr-title">FDM Filament — Chemical Resistance</div>
+    <div class="hdr-sub">Prusament A–D immersion scale for 8 core materials. HIPS, PA12, POM, and TPU 95A added from published TDS and immersion data. 9 new chemicals added for shop/FPV relevance. Columns alphabetical. Tap/click C or D cells for failure details.</div>
+  </div>
+  <div class="btn-row">
+    <button class="tbtn" id="themeBtn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      Light
+    </button>
+    <button class="tbtn" id="exportSvgBtn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      SVG
+    </button>
+    <button class="tbtn" id="exportPngBtn">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+      PNG
+    </button>
+    <button class="tbtn" onclick="window.print()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+      Print
+    </button>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input id="searchInput" type="text" placeholder="Search chemical…" autocomplete="off">
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="filter-group">
+    <span>Show only:</span>
+    <label><input type="checkbox" id="filterCD" value="CD"> C or D rated cells</label>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="filter-group">
+    <span>Highlight:</span>
+    <label><input type="checkbox" id="filterBest"> Best material per row</label>
+  </div>
+  <div class="ctrl-sep"></div>
+  <div class="mat-toggle-wrap">
+    <span>Columns:</span>
+    <button id="showAllMats" title="Show all materials">All</button>
+    <span id="matToggles"></span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><span class="leg-chip leg-A">A</span> Resists very well (&lt;1%)</div>
+  <div class="leg-sep"></div>
+  <div class="leg-item"><span class="leg-chip leg-B">B</span> Moderate (2–3%)</div>
+  <div class="leg-sep"></div>
+  <div class="leg-item"><span class="leg-chip leg-C">C</span> Poor (4–5%)</div>
+  <div class="leg-sep"></div>
+  <div class="leg-item"><span class="leg-chip leg-D">D</span> Fails (&gt;5% / destroyed)</div>
+  <div class="leg-sep"></div>
+  <div class="leg-item"><span class="leg-chip leg-none">–</span> No data</div>
+  <div class="leg-sep"></div>
+  <div class="leg-hint">
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity:0.55"><path d="M9 11V6a2 2 0 0 1 4 0v5"/><path d="M13 11V9a2 2 0 0 1 4 0v4a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-1a2 2 0 0 1 4 0"/></svg>
+    Tap C/D for details
+  </div>
+</div>
+
+<div class="card"><div class="scroll">
+  <table id="mainTable">
+    <thead><tr id="headerRow">
+      <th>Chemical</th>
+    </tr></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div></div>
+
+<div class="tipbox" id="tipbox">
+  <div class="tip-header" id="tipHeader"></div>
+  <div class="tip-rating" id="tipRating"></div>
+  <div class="tip-text" id="tipText"></div>
+</div>
+
+<div class="panels">
+  <div class="panel">
+    <h3>Rating Scale (Prusament A–D)</h3>
+    <dl>
+      <dt class="dtA">A</dt><dd>Resists very well. No melt, absorption, or swelling after 1-week immersion (&lt;1% change in weight/dimensions).</dd>
+      <dt class="dtB">B</dt><dd>Resists moderately. Slight swelling or weight change (2–3%).</dd>
+      <dt class="dtC">C</dt><dd>Resists poorly. Significant swelling or change (4–5%) with prolonged exposure.</dd>
+      <dt class="dtD">D</dt><dd>Does not resist. Severe change (&gt;5%) or complete destruction of the material.</dd>
+    </dl>
+  </div>
+  <div class="panel">
+    <h3>Data Sources</h3>
+    <ul>
+      <li><strong>ABS, ASA, PA, PC, PETG, PLA, PP, PVB</strong> — Prusament chemical resistance study, Prusa Research (2021).</li>
+      <li><strong>HIPS</strong> — Simplify3D materials guide; K-Mac plastics chemical resistance data.</li>
+      <li><strong>PA12</strong> — Paragon RT / Smith Metal Centres PA12 TDS; Filamentek chemical resistance chart.</li>
+      <li><strong>POM</strong> — K-Mac Plastics Acetal chart; ISM POM compatibility guide; Graco guide.</li>
+      <li><strong>TPU 95A</strong> — Forerunner 3D ESTANE® M95A immersion (2025); UltiMaker TDS; BASF Elastollan.</li>
+      <li><strong>New chemicals</strong> — IPA 91%: interpolated; Flux remover: MG Chemicals / Techspray TDS; Brake fluid: Reddit immersion reports + PP/PA TDS; WD-40/gasoline/motor oil: published plastics compatibility guides.</li>
+      <li>* Fridex = ethylene glycol antifreeze. ** Savo = NaClO 4.7 g/100 g. † Flux remover = IPA/EtOH/ethyl acetate blend. †† DOT3/4 = polyglycol ether base.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+const MATS = ["ABS", "ASA", "HIPS", "PA", "PA12", "PC", "PETG", "PLA", "POM", "PP", "PVB", "TPU 95A"];
+const ROWS = [["Water", "H₂O", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "measured"], ["IPA 75%", "Isopropyl alcohol", "B", "B", "C", "A", "A", "B", "A", "C", "A", "A", "D", "C", "measured"], ["IPA 91%", "Isopropyl alcohol", "B", "B", "D", "A", "A", "B", "A", "C", "A", "A", "D", "C", "measured"], ["IPA 99%", "Isopropyl alcohol", "B", "B", "D", "A", "A", "B", "B", "C", "A", "A", "D", "D", "measured"], ["Acetic acid 8%", "Vinegar C₂H₄O₂", "B", "A", "B", "C", "B", "A", "A", "B", "B", "A", "C", "B", "estimated"], ["Sodium chloride 10%", "Salt NaCl", "A", "B", "A", "A", "A", "A", "A", "B", "A", "A", "B", "A", "measured"], ["Citric acid", "C₆H₈O₇", "-", "A", "A", "B", "A", "A", "A", "B", "A", "A", "B", "B", "estimated"], ["Hydrochloric acid 37%", "HCl", "C", "C", "C", "D", "C", "A", "A", "C", "B", "A", "-", "D", "inferred"], ["Hydrogen peroxide 30%", "H₂O₂", "A", "A", "B", "A", "A", "A", "A", "B", "B", "A", "-", "B", "measured"], ["Phosphoric acid 85%", "H₃PO₄", "-", "A", "B", "D", "B", "A", "C", "C", "A", "A", "-", "C", "inferred"], ["Nitric acid 69%", "HNO₃", "A", "-", "D", "D", "D", "D", "D", "D", "D", "A", "-", "D", "inferred"], ["Sulphuric acid 96%", "H₂SO₄", "-", "-", "D", "D", "D", "D", "D", "D", "C", "A", "-", "D", "inferred"], ["Fridex *", "Ethylene glycol C₂H₆O₂", "-", "A", "A", "-", "A", "A", "A", "B", "A", "A", "B", "A", "measured"], ["Savo **", "NaClO", "-", "A", "B", "A", "A", "B", "A", "B", "B", "A", "B", "C", "estimated"], ["Ethanol", "C₂H₆O", "A", "B", "D", "A", "A", "B", "B", "C", "A", "A", "D", "D", "measured"], ["Acetone", "C₃H₆O", "D", "D", "D", "A", "A", "C", "C", "D", "A", "A", "D", "D", "measured"], ["WD-40 / Mineral oil", "Petroleum distillates", "B", "B", "B", "A", "A", "B", "B", "B", "A", "A", "B", "B", "estimated"], ["Flux remover †", "IPA/EtOH/ethyl acetate", "D", "C", "D", "B", "B", "C", "B", "C", "A", "A", "D", "C", "estimated"], ["Brake fluid DOT3/4 ††", "Polyglycol ethers", "C", "C", "C", "A", "A", "C", "B", "D", "A", "A", "D", "B", "estimated"], ["Gasoline / petrol", "Aliphatic hydrocarbons", "C", "B", "C", "A", "A", "B", "B", "C", "A", "A", "C", "B", "estimated"], ["Motor oil", "Mineral oil base", "A", "A", "A", "A", "A", "A", "A", "B", "A", "A", "A", "A", "estimated"], ["NaOH lye 10%", "Sodium hydroxide", "B", "B", "B", "D", "B", "B", "A", "D", "D", "A", "B", "B", "estimated"], ["CA glue (cyanoacrylate)", "Ethyl 2-cyanoacrylate", "B", "B", "B", "A", "A", "C", "A", "B", "A", "A", "B", "B", "estimated"]];
+const TIPS = {"IPA 75%|HIPS": "Surface whitening and swelling. HIPS is styrene-based and susceptible to alcohols; prolonged 75% IPA exposure causes visible surface attack.", "IPA 75%|PLA": "Surface becomes tacky with micro-crazing. Significant weight gain (4–5%) observed; surface gloss lost after extended exposure.", "IPA 75%|PVB": "Material dissolves rapidly — PVB is used intentionally as an IPA-soluble support. Complete structural breakdown within hours.", "IPA 75%|TPU 95A": "Surface softening and swelling (~10–15% volume change) after extended immersion. Elasticity and tensile strength reduce significantly.", "IPA 91%|HIPS": "Significant surface attack and dissolution of styrene phase. 91% IPA is aggressive enough to fully degrade HIPS.", "IPA 91%|PLA": "Crazing and surface degradation similar to 75% but faster. Part warps under load after prolonged exposure.", "IPA 91%|PVB": "Complete dissolution — PVB dissolves readily in IPA at all concentrations above ~50%.", "IPA 91%|TPU 95A": "Noticeable swelling and strength loss. Higher IPA concentration increases aggression vs. 75% IPA.", "IPA 99%|HIPS": "Complete surface dissolution. Anhydrous IPA fully destroys HIPS — same mechanism as acetone on ABS.", "IPA 99%|PLA": "Severe crazing and warping. Anhydrous IPA is more aggressive than 75%; part loses dimensional stability.", "IPA 99%|PVB": "Complete destruction within minutes. PVB is highly soluble in pure IPA.", "IPA 99%|TPU 95A": "Severe swelling (>15% volume) and major tensile strength loss. Pure IPA is significantly more aggressive than 75% on TPU.", "Acetic acid 8%|PA": "Acetic acid attacks nylon amide bonds causing hydrolysis and surface degradation. Substantial swelling and loss of mechanical properties.", "Acetic acid 8%|PVB": "Significant weight gain and surface attack. PVB is an acetate-derived polymer susceptible to acetic acid hydrolysis.", "Hydrochloric acid 37%|ABS": "Surface etching, crazing, and swelling of styrene/butadiene phases. HCl degrades the rubber component of ABS.", "Hydrochloric acid 37%|ASA": "Surface dulling and micro-crazing. Concentrated HCl causes surface attack on ASA's styrene phase.", "Hydrochloric acid 37%|HIPS": "Surface whitening, softening, and micro-crazing. Concentrated HCl attacks HIPS over prolonged immersion.", "Hydrochloric acid 37%|PA": "Severe — HCl protonates amide groups in nylon causing rapid hydrolysis and dissolution. Major weight gain and structural failure.", "Hydrochloric acid 37%|PA12": "Concentrated HCl partially hydrolyzes PA12 amide bonds; less severe than PA6 due to lower amide density but still causes significant weight gain.", "Hydrochloric acid 37%|PLA": "Strong acid accelerates PLA hydrolysis; surface becomes rough and pitted with significant weight change.", "Hydrochloric acid 37%|TPU 95A": "Strong acid causes hydrolysis of urethane linkages. Significant surface degradation; structural integrity compromised.", "Hydrogen peroxide 30%|HIPS": "Oxidizing agent causes surface bleaching and slight mechanical degradation in HIPS over prolonged exposure.", "Hydrogen peroxide 30%|POM": "Moderate oxidative attack on POM surface. H₂O₂ causes measurable weight gain and surface dulling.", "Hydrogen peroxide 30%|PLA": "Moderate surface attack. Concentrated H₂O₂ combines oxidation with hydrolysis on PLA ester bonds; slight softening observed.", "Phosphoric acid 85%|PA": "Severe — phosphoric acid attacks nylon amide bonds causing hydrolysis. Part swells significantly and loses all structural strength.", "Phosphoric acid 85%|PA12": "Moderate attack. PA12's lower amide density reduces severity vs. PA6 but concentrated H₃PO₄ still causes measurable degradation.", "Phosphoric acid 85%|PETG": "Surface pitting and weight gain at 4–5% range. Concentrated phosphoric acid attacks PETG over prolonged exposure.", "Phosphoric acid 85%|PLA": "Surface becomes sticky and deformed. Concentrated phosphoric acid accelerates hydrolysis of PLA ester bonds; part loses rigidity.", "Phosphoric acid 85%|TPU 95A": "Moderate surface attack and swelling. Phosphoric acid partially hydrolyzes urethane linkages; hardness and elongation reduced noticeably.", "Nitric acid 69%|HIPS": "Rapid surface oxidation and yellowing. Concentrated nitric acid attacks styrene phase causing color change and severe embrittlement.", "Nitric acid 69%|PA": "Complete attack — nitric acid rapidly destroys nylon via oxidation and hydrolysis. Complete part failure.", "Nitric acid 69%|PA12": "Severe oxidative attack similar to PA6. Nitric acid destroys PA12 via chain scission and oxidation.", "Nitric acid 69%|PC": "Severe yellowing and surface crazing. Nitric acid nitrates bisphenol-A aromatic rings causing rapid color change and embrittlement.", "Nitric acid 69%|PETG": "Severe surface oxidation. Nitric acid attacks aromatic rings in PETG causing discoloration and structural failure.", "Nitric acid 69%|PLA": "Rapid oxidative attack causing yellowing, surface crumbling, and part destruction. Nitric acid both hydrolyzes and oxidizes PLA.", "Nitric acid 69%|POM": "Complete surface destruction. Nitric acid rapidly oxidizes and depolymerizes POM (formaldehyde release). Part fully destroyed.", "Nitric acid 69%|TPU 95A": "Oxidizing acid causes rapid surface destruction. Nitric acid attacks urethane linkages and oxidizes soft segments; part destroyed within hours.", "Sulphuric acid 96%|HIPS": "Sulfonation and severe surface degradation. Concentrated H₂SO₄ destroys HIPS rapidly.", "Sulphuric acid 96%|PA": "Complete destruction — sulphuric acid hydrolyzes and protonates nylon rapidly. Part dissolves / fully decomposes.", "Sulphuric acid 96%|PA12": "Severe — concentrated H₂SO₄ causes rapid hydrolysis and protonation of PA12 amide groups. Complete structural failure.", "Sulphuric acid 96%|PC": "Catastrophic surface attack. H₂SO₄ sulfonates PC's aromatic groups causing extreme embrittlement and crumbling.", "Sulphuric acid 96%|PETG": "Severe sulfonation of aromatic ring. Part surface blackens and loses all mechanical integrity.", "Sulphuric acid 96%|PLA": "Rapid hydrolysis and charring. Concentrated H₂SO₄ acts as both acid and dehydrating agent; PLA fully destroyed.", "Sulphuric acid 96%|POM": "Catastrophic depolymerization. Concentrated H₂SO₄ causes immediate breakdown of POM into formaldehyde; part is destroyed.", "Sulphuric acid 96%|TPU 95A": "Complete structural failure. Concentrated H₂SO₄ hydrolyzes urethane bonds and oxidizes the polymer backbone; rapid dissolution observed.", "Savo **|TPU 95A": "Sodium hypochlorite causes oxidative chain scission in TPU. Prolonged exposure causes surface tackiness and hardness reduction.", "Ethanol|HIPS": "Complete dissolution — HIPS dissolves readily in ethanol and other alcohols. Full structural collapse.", "Ethanol|PLA": "Surface becomes tacky and slightly swollen. Ethanol is a weak plasticizer for PLA; prolonged contact causes measurable dimensional change.", "Ethanol|PVB": "Rapid dissolution — PVB is highly soluble in ethanol. Complete structural collapse within hours.", "Ethanol|TPU 95A": "Severe swelling (>20% volume change). Ethanol is one of the worst solvents for TPU; elasticity and strength severely reduced.", "Acetone|ABS": "Complete dissolution — acetone is intentionally used to smooth/bond ABS. Immersion causes full structural failure.", "Acetone|ASA": "Rapid surface attack and dissolution of styrene phase. ASA is highly susceptible to ketones; part surface becomes liquid-like.", "Acetone|HIPS": "Complete dissolution — HIPS is a styrene copolymer and dissolves rapidly in acetone, similar to ABS.", "Acetone|PC": "Surface crazing, micro-cracking, and significant swelling. Acetone causes stress cracking in PC particularly under any mechanical load.", "Acetone|PETG": "Significant surface crazing and swelling (4–5%). Acetone does not fully dissolve PETG but causes surface whitening, cracking, and embrittlement.", "Acetone|PLA": "Rapid dissolution and surface melting. Acetone is a strong solvent for PLA; parts warp, delaminate, and lose all structural integrity.", "Acetone|PVB": "Complete destruction within minutes. PVB dissolves rapidly in acetone and all ketone solvents.", "Acetone|TPU 95A": "Complete failure — acetone fully penetrates TPU causing massive swelling and dissolution of soft segments. Part loses all structural integrity.", "Flux remover †|ABS": "IPA/ethanol/ethyl acetate blend attacks ABS's styrene-butadiene rubber phase. Crazing, swelling, and surface dissolution observed.", "Flux remover †|ASA": "Ethyl acetate and alcohols in flux remover cause surface attack on ASA's styrene phase. Significant surface dulling and micro-crazing.", "Flux remover †|HIPS": "Complete dissolution — HIPS is vulnerable to both alcohol and ester solvents present in most flux removers.", "Flux remover †|PC": "Flux remover solvents cause surface stress cracking and crazing in PC. Avoid contact with any loaded PC parts.", "Flux remover †|PLA": "IPA and ethyl acetate in flux remover attack PLA's ester backbone. Surface becomes tacky and dimensionally unstable.", "Flux remover †|PVB": "Complete dissolution — PVB dissolves in all IPA/alcohol-based flux removers.", "Flux remover †|TPU 95A": "Blend of alcohols and esters causes significant swelling and surface softening in TPU. PA or PP are better choices near flux remover.", "Brake fluid DOT3/4 ††|ABS": "DOT3/4 polyglycol ethers cause embrittlement and surface attack on ABS. Not recommended for brake-adjacent printed parts.", "Brake fluid DOT3/4 ††|ASA": "Polyglycol ethers in DOT3/4 cause surface crazing and weight gain in ASA over prolonged exposure.", "Brake fluid DOT3/4 ††|HIPS": "HIPS degrades significantly in DOT3/4. Styrene-based polymers are generally not brake-fluid compatible.", "Brake fluid DOT3/4 ††|PC": "Glycol ether solvents in DOT3/4 cause surface stress cracking in polycarbonate. Not recommended.", "Brake fluid DOT3/4 ††|PLA": "Severe degradation — glycol ethers and residual water in brake fluid aggressively attack PLA's ester linkages. Part softens and deforms.", "Brake fluid DOT3/4 ††|PVB": "Complete dissolution — PVB is highly susceptible to polyglycol ether solvents in brake fluid.", "Gasoline / petrol|ABS": "Aliphatic and aromatic hydrocarbons in gasoline swell and soften ABS. Not suitable for fuel-contact applications.", "Gasoline / petrol|HIPS": "Significant swelling and surface attack. Aromatic fractions in gasoline dissolve HIPS's styrene phase.", "Gasoline / petrol|PLA": "Significant swelling and surface crazing. Gasoline penetrates PLA causing dimensional instability; not suitable for fuel contact.", "Gasoline / petrol|PVB": "Moderate to severe attack from aromatic hydrocarbon content in gasoline. PVB swells significantly.", "NaOH lye 10%|PA": "Significant — NaOH hydrolyzes nylon amide bonds at even low concentrations. Prolonged exposure causes surface degradation and loss of strength.", "NaOH lye 10%|PLA": "Complete destruction — NaOH rapidly hydrolyzes PLA's ester bonds causing rapid dissolution. PLA has no resistance to strong alkalis.", "NaOH lye 10%|POM": "Complete destruction — NaOH depolymerizes POM at the chain ends (end-group unzipping) causing rapid dissolution. POM has zero alkali resistance.", "CA glue (cyanoacrylate)|PC": "CA glue reacts exothermically with polycarbonate causing localized stress cracking and surface crazing at the bond site."};
+
+// col index in ROWS[i]: name=0,formula=1, then mat values at 2..13, tpu_conf=14
+// MATS order: ABS=0,ASA=1,HIPS=2,PA=3,PA12=4,PC=5,PETG=6,PLA=7,POM=8,PP=9,PVB=10,TPU=11
+
+const ratingOrder = {'A':0,'B':1,'C':2,'D':3};
+function rc(v){ return (!v||v==='-')?'r_':'r'+v; }
+function lbl(v){ return (!v||v==='-')?'\u2013':v; }
+function cssVar(n){ return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+// ── Build header ──────────────────────────────────────────────────────────────
+const headerRow = document.getElementById('headerRow');
+const hiddenCols = new Set();
+
+MATS.forEach((m, ci) => {
+  const th = document.createElement('th');
+  th.textContent = m;
+  th.dataset.ci = ci;
+  th.innerHTML = m + ' <span class="sort-icon"></span>';
+  th.addEventListener('click', () => sortByCol(ci));
+  headerRow.appendChild(th);
+});
+
+// ── Build body ────────────────────────────────────────────────────────────────
+const tbody = document.getElementById('tbody');
+let currentSort = null; // {ci, dir}
+
+function buildRows(data) {
+  tbody.innerHTML = '';
+  data.forEach((row, ri) => {
+    const tr = document.createElement('tr');
+    tr.dataset.ri = ri;
+
+    const td0 = document.createElement('td');
+    td0.className = 'chem';
+    td0.innerHTML = row[0] + '<span class="formula">' + row[1] + '</span>';
+    tr.appendChild(td0);
+
+    MATS.forEach((mat, ci) => {
+      const val = row[ci + 2];
+      const td = document.createElement('td');
+      td.className = 'r ' + rc(val);
+      td.dataset.ci = ci;
+      if (hiddenCols.has(ci)) td.classList.add('col-hidden');
+      const hasTip = (val==='C'||val==='D') && TIPS[row[0]+'|'+mat];
+      if (hasTip) {
+        td.classList.add('has-tip');
+        td.tabIndex = 0;
+        td.setAttribute('role','button');
+        const openTip = (e) => {
+          e.stopPropagation();
+          if (activeCell === td) { hideTip(); return; }
+          hideTip(); activeCell = td; td.classList.add('active');
+          const rect = td.getBoundingClientRect();
+          showTip(row[0], mat, val, rect.right, rect.top + rect.height/2);
+        };
+        td.addEventListener('click', openTip);
+        td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openTip(e); } });
+      }
+      td.innerHTML = '<span class="chip">' + lbl(val) + '</span>';
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+  applyFilters();
+  if (document.getElementById('filterBest').checked) highlightBest();
+}
+
+buildRows(ROWS);
+
+// ── Tooltip ───────────────────────────────────────────────────────────────────
+const tipbox = document.getElementById('tipbox');
+const tipHeader = document.getElementById('tipHeader');
+const tipRating = document.getElementById('tipRating');
+const tipText = document.getElementById('tipText');
+let activeCell = null;
+
+function showTip(chem, mat, rating, x, y) {
+  const desc = TIPS[chem+'|'+mat];
+  if (!desc) return;
+  tipbox.className = 'tipbox visible r'+rating;
+  tipHeader.textContent = chem + ' — ' + mat;
+  tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% or destroyed)');
+  tipText.textContent = desc;
+  const pw=255,ph=130,vw=window.innerWidth,vh=window.innerHeight;
+  let tx=x+12,ty=y-10;
+  if(tx+pw>vw-8) tx=x-pw-12;
+  if(ty+ph>vh-8) ty=vh-ph-8;
+  if(ty<8) ty=8;
+  tipbox.style.left=tx+'px'; tipbox.style.top=ty+'px';
+}
+function hideTip() {
+  tipbox.classList.remove('visible');
+  if(activeCell){ activeCell.classList.remove('active'); activeCell=null; }
+}
+document.addEventListener('click', e => { if(!tipbox.contains(e.target)&&!(activeCell&&activeCell.contains(e.target))) hideTip(); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') hideTip(); });
+
+// ── Filters ───────────────────────────────────────────────────────────────────
+function applyFilters() {
+  const cdOnly = document.getElementById('filterCD').checked;
+  const q = document.getElementById('searchInput').value.trim().toLowerCase();
+  Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+    const chem = tr.querySelector('td.chem');
+    const name = chem ? chem.childNodes[0].textContent.toLowerCase() : '';
+    const formula = chem ? (chem.querySelector('.formula')||{}).textContent?.toLowerCase()||'' : '';
+    const matchSearch = !q || name.includes(q) || formula.includes(q);
+    if (!matchSearch) { tr.classList.add('row-hidden'); return; }
+    if (cdOnly) {
+      const vals = Array.from(tr.querySelectorAll('td.r')).map(td => td.querySelector('.chip')?.textContent.trim());
+      const hasCD = vals.some(v => v==='C'||v==='D');
+      tr.classList.toggle('row-hidden', !hasCD);
+    } else {
+      tr.classList.remove('row-hidden');
+    }
+    tr.classList.toggle('row-highlight', !!q && matchSearch);
+  });
+}
+
+document.getElementById('filterCD').addEventListener('change', applyFilters);
+document.getElementById('searchInput').addEventListener('input', applyFilters);
+document.getElementById('filterBest').addEventListener('change', () => {
+  if(document.getElementById('filterBest').checked) highlightBest(); else clearBest();
+});
+
+function highlightBest() {
+  Array.from(tbody.querySelectorAll('tr')).forEach(tr => {
+    const cells = Array.from(tr.querySelectorAll('td.r'));
+    let best = null, bestRank = 99;
+    cells.forEach(td => {
+      const v = td.querySelector('.chip')?.textContent.trim();
+      const rank = ratingOrder[v] ?? 99;
+      if(rank < bestRank){ bestRank=rank; best=td; }
+    });
+    if(best) best.classList.add('best-col');
+  });
+}
+function clearBest() {
+  tbody.querySelectorAll('.best-col').forEach(td => td.classList.remove('best-col'));
+}
+
+// ── Column toggles ────────────────────────────────────────────────────────────
+const matToggles = document.getElementById('matToggles');
+MATS.forEach((m, ci) => {
+  const btn = document.createElement('button');
+  btn.textContent = m;
+  btn.title = 'Toggle '+m;
+  btn.dataset.ci = ci;
+  btn.addEventListener('click', () => {
+    if(hiddenCols.has(ci)){ hiddenCols.delete(ci); btn.style.opacity='1'; btn.style.textDecoration='none'; }
+    else{ hiddenCols.add(ci); btn.style.opacity='0.4'; btn.style.textDecoration='line-through'; }
+    document.querySelectorAll('[data-ci="'+ci+'"]').forEach(el => el.classList.toggle('col-hidden',hiddenCols.has(ci)));
+  });
+  matToggles.appendChild(btn);
+});
+document.getElementById('showAllMats').addEventListener('click', () => {
+  hiddenCols.clear();
+  matToggles.querySelectorAll('button').forEach(btn => { btn.style.opacity='1'; btn.style.textDecoration='none'; });
+  document.querySelectorAll('.col-hidden').forEach(el => el.classList.remove('col-hidden'));
+});
+
+// ── Sort by column ────────────────────────────────────────────────────────────
+function sortByCol(ci) {
+  const ths = Array.from(headerRow.querySelectorAll('th'));
+  ths.forEach(th => th.classList.remove('sort-asc','sort-desc'));
+  if(currentSort && currentSort.ci===ci && currentSort.dir==='asc') {
+    currentSort = {ci, dir:'desc'};
+    ths[ci+1].classList.add('sort-desc');
+  } else {
+    currentSort = {ci, dir:'asc'};
+    ths[ci+1].classList.add('sort-asc');
+  }
+  const sorted = [...ROWS].sort((a,b) => {
+    const av = a[ci+2], bv = b[ci+2];
+    const ar = ratingOrder[av]??99, br = ratingOrder[bv]??99;
+    return currentSort.dir==='asc' ? ar-br : br-ar;
+  });
+  buildRows(sorted);
+}
+
+// ── Theme toggle ──────────────────────────────────────────────────────────────
+(function(){
+  const btn = document.getElementById('themeBtn');
+  const root = document.documentElement;
+  let dark = false;
+  btn.addEventListener('click', () => {
+    dark = !dark;
+    root.setAttribute('data-theme', dark?'dark':'light');
+    btn.innerHTML = dark
+      ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg> Dark'
+      : '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg> Light';
+  });
+})();
+
+// ── SVG/PNG Export ────────────────────────────────────────────────────────────
+function buildExportSVG() {
+  const SCALE = 1;
+  const COL_CHEM = 190, COL_W = 56, ROW_H = 32, PAD = 14, HEADER_H = 36;
+  const CHIP_W = 34, CHIP_H = 20, CHIP_R = 4, FOOT_H = 105;
+
+  const visibleMats = MATS.filter((_,ci) => !hiddenCols.has(ci));
+  const visibleCols = MATS.map((_,ci) => ci).filter(ci => !hiddenCols.has(ci));
+  const visibleRows = Array.from(tbody.querySelectorAll('tr:not(.row-hidden)')).map(tr => {
+    const ri = parseInt(tr.dataset.ri);
+    return ROWS[ri] || null;
+  }).filter(Boolean);
+
+  const nCols = visibleMats.length;
+  const nRows = visibleRows.length;
+  const totalW = PAD*2 + COL_CHEM + nCols * COL_W;
+  const totalH = PAD + HEADER_H + nRows * ROW_H + PAD + FOOT_H + PAD;
+
+  const colors = {
+    bg:cssVar('--bg'),surface:cssVar('--surface'),surface2:cssVar('--surface2'),
+    border:cssVar('--border'),divider:cssVar('--divider'),
+    text:cssVar('--text'),muted:cssVar('--muted'),faint:cssVar('--faint'),
+  };
+  function chipClr(r){
+    if(r==='A') return [cssVar('--A-bg'),cssVar('--A-fg')];
+    if(r==='B') return [cssVar('--B-bg'),cssVar('--B-fg')];
+    if(r==='C') return [cssVar('--C-bg'),cssVar('--C-fg')];
+    if(r==='D') return [cssVar('--D-bg'),cssVar('--D-fg')];
+    return [cssVar('--none-bg'),cssVar('--none-fg')];
+  }
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  const cardX=PAD, cardY=PAD, cardW=totalW-PAD*2, cardH=HEADER_H+nRows*ROW_H;
+  let s='';
+  s+=`<rect width="${totalW}" height="${totalH}" fill="${colors.bg}"/>`;
+  s+=`<rect x="${cardX}" y="${cardY}" width="${cardW}" height="${cardH}" rx="10" fill="${colors.surface}" stroke="${colors.border}" stroke-width="1"/>`;
+  s+=`<rect x="${cardX}" y="${cardY}" width="${cardW}" height="${HEADER_H}" rx="10" fill="${colors.surface2}"/>`;
+  s+=`<rect x="${cardX}" y="${cardY+HEADER_H-8}" width="${cardW}" height="8" fill="${colors.surface2}"/>`;
+  s+=`<line x1="${cardX}" y1="${cardY+HEADER_H}" x2="${cardX+cardW}" y2="${cardY+HEADER_H}" stroke="${colors.border}" stroke-width="1.5"/>`;
+  s+=`<text x="${cardX+PAD}" y="${cardY+HEADER_H/2+4}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="600" fill="${colors.muted}">Chemical</text>`;
+  visibleMats.forEach((m,di)=>{
+    const cx=cardX+COL_CHEM+di*COL_W+COL_W/2;
+    s+=`<text x="${cx}" y="${cardY+HEADER_H/2+4}" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="${colors.muted}">${esc(m)}</text>`;
+  });
+
+  visibleRows.forEach((row,ri)=>{
+    const ry=cardY+HEADER_H+ri*ROW_H;
+    if(ri>0) s+=`<line x1="${cardX+1}" y1="${ry}" x2="${cardX+cardW-1}" y2="${ry}" stroke="${colors.divider}" stroke-width="0.6"/>`;
+    const textY=ry+ROW_H/2-2;
+    s+=`<text x="${cardX+PAD}" y="${textY}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="500" fill="${colors.text}">${esc(row[0])}</text>`;
+    s+=`<text x="${cardX+PAD}" y="${textY+10}" font-family="monospace" font-size="7" fill="${colors.faint}">${esc(row[1])}</text>`;
+    visibleCols.forEach((ci,di)=>{
+      const val=row[ci+2];
+      const [bg,fg]=chipClr(val==='–'?null:val);
+      const cx=cardX+COL_CHEM+di*COL_W+COL_W/2;
+      const cy=ry+ROW_H/2;
+      s+=`<rect x="${cx-CHIP_W/2}" y="${cy-CHIP_H/2}" width="${CHIP_W}" height="${CHIP_H}" rx="${CHIP_R}" fill="${bg}"/>`;
+      s+=`<text x="${cx}" y="${cy+4.5}" text-anchor="middle" font-family="monospace" font-size="9.5" font-weight="700" fill="${fg}">${esc(lbl(val))}</text>`;
+    });
+  });
+
+  const footY=cardY+cardH+14;
+  [['A','<1% change'],['B','2–3% change'],['C','4–5% change'],['D','>5% / destroyed']].forEach(([r,desc],i)=>{
+    const col=i%2,row=Math.floor(i/2);
+    const fx=cardX+col*(cardW/2),fy=footY+row*20;
+    const [bg,fg]=chipClr(r);
+    s+=`<rect x="${fx}" y="${fy}" width="20" height="15" rx="3" fill="${bg}"/>`;
+    s+=`<text x="${fx+10}" y="${fy+11}" text-anchor="middle" font-family="monospace" font-size="8.5" font-weight="700" fill="${fg}">${r}</text>`;
+    s+=`<text x="${fx+26}" y="${fy+11}" font-family="Inter,Arial,sans-serif" font-size="8" fill="${colors.muted}">${esc(r==='A'?'Resists very well ('+desc+')':r==='B'?'Moderate ('+desc+')':r==='C'?'Resists poorly ('+desc+')':'Does not resist ('+desc+')')}</text>`;
+  });
+  const sy=footY+46;
+  s+=`<text x="${cardX}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="7" fill="${colors.faint}">Sources: Prusament (2021) + Forerunner 3D / UltiMaker / BASF / K-Mac / ISM / MG Chemicals TDS data. * Fridex=ethylene glycol ** Savo=NaClO † Flux remover=IPA/EtOH/ethyl acetate blend †† DOT3/4=polyglycol ether</text>`;
+  s+=`<text x="${cardX}" y="${sy+11}" font-family="Inter,Arial,sans-serif" font-size="7" fill="${colors.faint}">Generated ${new Date().toLocaleDateString('en-CA')}. Tap C/D cells in interactive version for failure descriptions.</text>`;
+
+  return {svg:`<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}">${s}</svg>`,w:totalW,h:totalH};
+}
+
+document.getElementById('exportSvgBtn').addEventListener('click',()=>{
+  const {svg} = buildExportSVG();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
+  a.download='filament-chemical-resistance.svg'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+});
+
+document.getElementById('exportPngBtn').addEventListener('click',()=>{
+  const {svg,w,h} = buildExportSVG();
+  const SCALE=2;
+  const img=new Image();
+  const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
+  img.onload=()=>{
+    const c=document.createElement('canvas');
+    c.width=w*SCALE; c.height=h*SCALE;
+    const ctx=c.getContext('2d');
+    ctx.scale(SCALE,SCALE); ctx.drawImage(img,0,0);
+    URL.revokeObjectURL(url);
+    c.toBlob(b=>{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(b);
+      a.download='filament-chemical-resistance.png'; a.click();
+      setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    },'image/png');
+  };
+  img.src=url;
+});
+</script>
+</body>
+</html>
