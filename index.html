@@ -147,6 +147,16 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
   td.chem-cell .fml{font-size:5.5pt}
   @page{size:landscape;margin:7mm}
 }
+
+/* ── TABS ────────────────────────────────────────────────────────────────── */
+.tabs{max-width:1400px;margin:0 auto .75rem;display:flex;gap:.25rem;border-bottom:2px solid var(--border)}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;padding:.45rem .9rem;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;font-family:inherit;border-radius:6px 6px 0 0;transition:color 120ms,background 120ms;white-space:nowrap}
+.tab-btn:hover{color:var(--text);background:var(--surface2)}
+.tab-btn.active{color:var(--text);border-bottom-color:var(--text)}
+.tab-panel{display:none}.tab-panel.active{display:block}
+/* empty-state for stub tabs */
+.tab-empty{max-width:1400px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:3rem 2rem;text-align:center;color:var(--muted);font-size:.82rem}
+.tab-empty strong{display:block;font-size:1rem;color:var(--text);margin-bottom:.4rem}
 </style>
 </head>
 <body>
@@ -175,6 +185,13 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
     </button>
   </div>
 </div>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="chemical-resistance">Chemical resistance</button>
+  <button class="tab-btn" data-tab="adhesives">Adhesives</button>
+</div>
+
+<div class="tab-panel active" id="tab-chemical-resistance">
 
 <div class="controls">
   <div class="ctrl-pill">
@@ -245,6 +262,15 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
     <ul id="refList"></ul>
   </div>
 </div>
+</div><!-- /tab-panel chemical-resistance -->
+
+<div class="tab-panel" id="tab-adhesives">
+  <div class="tab-empty">
+    <strong>Adhesives compatibility</strong>
+    This tab will contain adhesive compatibility data (CA glue, epoxy, PVA, etc.) for each filament material.<br>
+    Data coming soon — contributions welcome via the repository.
+  </div>
+</div><!-- /tab-panel adhesives -->
 
 <script>
 // ════════════════════════════════════════════════════════════════════════════
@@ -3679,6 +3705,13 @@ document.getElementById('exportPngBtn').addEventListener('click',()=>{
   };
   img.src=url;
 });
+
+// ── Tab switching ─────────────────────────────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === target));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + target));
+  });
+});
 </script>
-</body>
-</html>
