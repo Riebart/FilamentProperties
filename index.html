@@ -6755,15 +6755,24 @@ function sortByCol(ci) {
 
 // ── SVG/PNG Export (reads live table state) ───────────────────────────────
 function buildExportSVG(){
+  const activeTab = document.querySelector('.tab-btn.active').dataset.tab;
+  const panel = document.getElementById('tab-' + activeTab);
+  const tbodyRef = panel.querySelector('tbody');
+  const headerRowRef = panel.querySelector('thead tr');
+  
   const CC=185,CW=54,RH=31,PAD=13,HH=35,CW2=32,CH=19,CR=4,FOOT=100;
-  const visMats=MAT_KEYS.filter((_,ci)=>!hiddenCols.has(ci));
-  const visChems=sortedChemKeys.filter(ck=>DATA.chemicals[ck]);
-  const visRows=visChems.filter(ck=>{
-    const tr=tbody.querySelector(`tr[data-ck="${ck}"]`);
-    return tr && !tr.classList.contains('row-hidden');
+  
+  // Identify visible columns based on the active table's header
+  const visMats = MAT_KEYS.filter((mk, ci) => {
+    const th = headerRowRef.querySelector(`th[data-ci="${ci}"], th[data-ci="l${ci}"], th[data-ci="a${ci}"]`);
+    return th && !th.classList.contains('col-hidden');
   });
-  const nC=visMats.length,nR=visRows.length;
+
+  // Identify visible rows based on the active table's body
+  const visRowEls = Array.from(tbodyRef.querySelectorAll('tr:not(.row-hidden)'));
+  const nC=visMats.length, nR=visRowEls.length;
   const W=PAD*2+CC+nC*CW,H=PAD+HH+nR*RH+PAD+FOOT+PAD;
+
   function cv(n){return cssVar(n);}
   function chipC(r){
     if(r==='A')return[cv('--A-bg'),cv('--A-fg')];
@@ -6772,6 +6781,25 @@ function buildExportSVG(){
     if(r==='D')return[cv('--D-bg'),cv('--D-fg')];
     return[cv('--none-bg'),cv('--none-fg')];
   }
+
+  // Tab-specific configuration
+  let typeLabel = 'Chemical';
+  let dataSub = 'chemicals';
+  let ratingLabels = {A:'Resists very well',B:'Moderate',C:'Resists poorly',D:'Does not resist'};
+  let sourceText = 'Prusament (2021) lab immersion + published TDS.';
+
+  if (activeTab === 'lubricants') {
+    typeLabel = 'Lubricant';
+    dataSub = 'lubricants';
+    ratingLabels = {A:'Resists very well',B:'Moderate',C:'Resists poorly',D:'Fails (>5%)'};
+    sourceText = 'Manufacturer TDS and compatibility guides.';
+  } else if (activeTab === 'adhesives') {
+    typeLabel = 'Adhesive';
+    dataSub = 'adhesives';
+    ratingLabels = {A:'Strong bond',B:'Good / limited bond',C:'Weak / cosmetic',D:'Fails / no bond'};
+    sourceText = 'Manufacturer TDS and adhesive compatibility guides.';
+  }
+
   const cX=PAD,cY=PAD,cW=W-PAD*2,cH=HH+nR*RH;
   let s='';
   s+=`<rect width="${W}" height="${H}" fill="${cv('--bg')}"/>`;
@@ -6779,52 +6807,64 @@ function buildExportSVG(){
   s+=`<rect x="${cX}" y="${cY}" width="${cW}" height="${HH}" rx="10" fill="${cv('--surface2')}"/>`;
   s+=`<rect x="${cX}" y="${cY+HH-8}" width="${cW}" height="8" fill="${cv('--surface2')}"/>`;
   s+=`<line x1="${cX}" y1="${cY+HH}" x2="${cX+cW}" y2="${cY+HH}" stroke="${cv('--border')}" stroke-width="1.5"/>`;
-  s+=`<text x="${cX+PAD}" y="${cY+HH/2+4}" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="600" fill="${cv('--muted')}">Chemical</text>`;
+  s+=`<text x="${cX+PAD}" y="${cY+HH/2+4}" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="600" fill="${cv('--muted')}">${typeLabel}</text>`;
+  
   visMats.forEach((mk,di)=>{
     const cx=cX+CC+di*CW+CW/2;
     s+=`<text x="${cx}" y="${cY+HH/2+4}" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7.5" font-weight="700" fill="${cv('--muted')}">${esc(DATA.materials[mk]._meta.name)}</text>`;
   });
-  visRows.forEach((ck,ri)=>{
+
+  visRowEls.forEach((tr,ri)=>{
     const ry=cY+HH+ri*RH;
     if(ri>0) s+=`<line x1="${cX+1}" y1="${ry}" x2="${cX+cW-1}" y2="${ry}" stroke="${cv('--divider')}" stroke-width="0.6"/>`;
-    const chem=DATA.chemicals[ck];
+    
+    const key = tr.dataset.ck || tr.dataset.lk || tr.dataset.ak;
+    const item = DATA[dataSub][key];
+    if (!item) return;
+
     const ty=ry+RH/2-2;
-    s+=`<text x="${cX+PAD}" y="${ty}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="500" fill="${cv('--text')}">${esc(chem.name)}</text>`;
-    const aka=(chem.aka||[])[0]||'';
+    s+=`<text x="${cX+PAD}" y="${ty}" font-family="Inter,Arial,sans-serif" font-size="8.5" font-weight="500" fill="${cv('--text')}">${esc(item.name)}</text>`;
+    const aka=(item.aka||[])[0]||'';
     if(aka) s+=`<text x="${cX+PAD}" y="${ty+10}" font-family="monospace" font-size="6.5" fill="${cv('--faint')}">${esc(aka)}</text>`;
+    
     visMats.forEach((mk,di)=>{
-      const entry=getRating(mk,ck);
-      const rating=entry?.rating||null;
-      const[bg,fg]=chipC(rating);
+      const entry = DATA.materials[mk]?.[dataSub]?.[key];
+      const rating = entry?.rating || null;
+      const [bg,fg] = chipC(rating);
       const cx=cX+CC+di*CW+CW/2,cy=ry+RH/2;
       s+=`<rect x="${cx-CW2/2}" y="${cy-CH/2}" width="${CW2}" height="${CH}" rx="${CR}" fill="${bg}"/>`;
       s+=`<text x="${cx}" y="${cy+4.5}" text-anchor="middle" font-family="monospace" font-size="9" font-weight="700" fill="${fg}">${esc(chipLabel(rating))}</text>`;
     });
   });
+
   const fy=cY+cH+13;
-  [['A','<1%'],['B','2–3%'],['C','4–5%'],['D','>5%']].forEach(([r,d],i)=>{
+  [['A','Strong/Resists'],['B','Moderate'],['C','Poor/Weak'],['D','Fails/None']].forEach(([r,d],i)=>{
     const col=i%2,row=Math.floor(i/2);
     const fx=cX+col*(cW/2),ffy=fy+row*19;
     const[bg,fg]=chipC(r);
     s+=`<rect x="${fx}" y="${ffy}" width="19" height="14" rx="3" fill="${bg}"/>`;
     s+=`<text x="${fx+9.5}" y="${ffy+10.5}" text-anchor="middle" font-family="monospace" font-size="8" font-weight="700" fill="${fg}">${r}</text>`;
-    const labels={A:'Resists very well',B:'Moderate',C:'Resists poorly',D:'Does not resist'};
-    s+=`<text x="${fx+25}" y="${ffy+10.5}" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="${cv('--muted')}">${esc(labels[r])} (${d})</text>`;
+    s+=`<text x="${fx+25}" y="${ffy+10.5}" font-family="Inter,Arial,sans-serif" font-size="7.5" fill="${cv('--muted')}">${esc(ratingLabels[r])}</text>`;
   });
+  
   const sy=fy+44;
-  s+=`<text x="${cX}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="6.5" fill="${cv('--faint')}">Sources: Prusament (2021) lab immersion + BASF Elastollan / UltiMaker / K-Mac / Smith Metal / Graco / MG Chemicals TDS. Generated ${new Date().toLocaleDateString('en-CA')}.</text>`;
-  return{svg:`<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${s}</svg>`,W,H};
+  s+=`<text x="${cX}" y="${sy}" font-family="Inter,Arial,sans-serif" font-size="6.5" fill="${cv('--faint')}">Sources: ${sourceText} Generated ${new Date().toLocaleDateString('en-CA')}.</text>`;
+  
+  return {
+    svg: `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${s}</svg>`,
+    W, H, tab: activeTab
+  };
 }
 
 document.getElementById('exportSvgBtn').addEventListener('click',()=>{
-  const{svg}=buildExportSVG();
+  const{svg,tab}=buildExportSVG();
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml'}));
-  a.download='filament-chemical-resistance.svg'; a.click();
+  a.download=`filament-${tab}.svg`; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),2000);
 });
 document.getElementById('exportPngBtn').addEventListener('click',()=>{
-  const{svg,W,H}=buildExportSVG();
+  const{svg,W,H,tab}=buildExportSVG();
   const S=2,img=new Image();
   const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));
   img.onload=()=>{
@@ -6835,7 +6875,7 @@ document.getElementById('exportPngBtn').addEventListener('click',()=>{
     c.toBlob(b=>{
       const a=document.createElement('a');
       a.href=URL.createObjectURL(b);
-      a.download='filament-chemical-resistance.png'; a.click();
+      a.download=`filament-${tab}.png`; a.click();
       setTimeout(()=>URL.revokeObjectURL(a.href),2000);
     },'image/png');
   };
