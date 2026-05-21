@@ -237,13 +237,6 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
   </table>
 </div></div>
 
-<div class="tipbox" id="tipbox">
-  <div class="tip-hdr" id="tipHdr"></div>
-  <div class="tip-rating" id="tipRating"></div>
-  <div class="tip-body" id="tipBody"></div>
-  <div class="tip-refs" id="tipRefs"></div>
-</div>
-
 <div class="panels">
   <div class="panel">
     <h3>Rating Scale (A–D)</h3>
@@ -384,6 +377,13 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
     </div>
   </div>
 </div><!-- /tab-panel adhesives -->
+
+<div class="tipbox" id="tipbox">
+  <div class="tip-hdr" id="tipHdr"></div>
+  <div class="tip-rating" id="tipRating"></div>
+  <div class="tip-body" id="tipBody"></div>
+  <div class="tip-refs" id="tipRefs"></div>
+</div>
 
 <script>
 // ════════════════════════════════════════════════════════════════════════════
@@ -6449,6 +6449,97 @@ const DATA = {
   }
 };
 
+// ── Tooltip ───────────────────────────────────────────────────────────────
+const tipbox   = document.getElementById('tipbox');
+const tipHdr   = document.getElementById('tipHdr');
+const tipRating= document.getElementById('tipRating');
+const tipBody  = document.getElementById('tipBody');
+const tipRefs  = document.getElementById('tipRefs');
+let activeCell = null;
+let tipHideTimer = null;
+
+function showTip(name, matName, rating, entry, x, y, tabType) {
+  tipbox.className = 'tipbox visible r'+rating;
+  tipHdr.textContent = name + ' — ' + matName;
+  
+  if (tabType === 'adhesives') {
+    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Weak or unreliable bond':'No practical bond');
+  } else if (tabType === 'lubricants') {
+    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Fails (>5% / destroyed)');
+  } else {
+    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% / destroyed)');
+  }
+  
+  tipBody.textContent = entry.tip || '';
+
+  // Build clickable, numbered source links
+  tipRefs.innerHTML = '';
+  const refs = entry.references || [];
+  if (refs.length) {
+    const prefixText = document.createTextNode('Sources: ');
+    tipRefs.appendChild(prefixText);
+    refs.forEach((slug, i) => {
+      const r = DATA.references[slug];
+      const num = REF_INDEX[slug] || '?';
+      const label = r ? (r.authors ? r.authors + (r.year ? ' ' + r.year : '') : r.title) : slug;
+      const a = document.createElement('a');
+      a.textContent = label + ' [' + num + ']';
+      const prefix = tabType === 'adhesives' ? 'adhref-' : (tabType === 'lubricants' ? 'lubref-' : 'ref-');
+      a.href = '#' + prefix + slug;
+      a.dataset.refSlug = slug;
+      a.addEventListener('click', e => {
+        e.preventDefault();
+        hideTip();
+        highlightRef(slug, prefix);
+      });
+      tipRefs.appendChild(a);
+      if (i < refs.length - 1) tipRefs.appendChild(document.createTextNode('; '));
+    });
+  }
+
+  const pw=268,ph=160,vw=window.innerWidth,vh=window.innerHeight;
+  let tx=x+12,ty=y-10;
+  if(tx+pw>vw-8) tx=x-pw-12;
+  if(ty+ph>vh-8) ty=vh-ph-8;
+  if(ty<8) ty=8;
+  tipbox.style.left=tx+'px'; tipbox.style.top=ty+'px';
+}
+
+function hideTip() {
+  clearTimeout(tipHideTimer);
+  tipbox.classList.remove('visible');
+  if (activeCell) { activeCell.classList.remove('active'); activeCell=null; }
+}
+function scheduledHide() {
+  tipHideTimer = setTimeout(hideTip, 180);
+}
+function cancelHide() {
+  clearTimeout(tipHideTimer);
+}
+
+// Global listeners
+document.addEventListener('click', e => {
+  if (e.target.closest('td.has-tip')) return;
+  if (!tipbox.contains(e.target) && !(activeCell?.contains(e.target))) hideTip();
+});
+document.addEventListener('keydown', e => { if(e.key==='Escape') hideTip(); });
+
+// Keep tooltip open while mouse is over it
+tipbox.addEventListener('mouseenter', cancelHide);
+tipbox.addEventListener('mouseleave', scheduledHide);
+
+function highlightRef(slug, prefix = 'ref-') {
+  const li = document.getElementById(prefix + slug);
+  if (!li) return;
+  const rect = li.getBoundingClientRect();
+  const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+  if (!inView) li.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  li.classList.remove('ref-highlight');
+  void li.offsetWidth;
+  li.classList.add('ref-highlight');
+  li.addEventListener('animationend', () => li.classList.remove('ref-highlight'), { once: true });
+}
+
 // ── Derived display order (alphabetical by material name) ─────────────────
 const MAT_KEYS = Object.keys(DATA.materials).sort((a,b) =>
   DATA.materials[a]._meta.name.localeCompare(DATA.materials[b]._meta.name));
@@ -6548,8 +6639,8 @@ function buildRows(chemOrder) {
         const open = e => {
           e.stopPropagation();
           if (activeCell === td) { hideTip(); return; }
-          activeCell = td; td.classList.add('active');
           hideTip();
+          activeCell = td; td.classList.add('active');
           const rect = td.getBoundingClientRect();
           showTip(chem.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2, 'chemicals');
         };
@@ -6649,98 +6740,6 @@ function sortByCol(ci) {
   });
   buildRows(sortedChemKeys);
 }
-
-// ── Tooltip ───────────────────────────────────────────────────────────────
-const tipbox   = document.getElementById('tipbox');
-const tipHdr   = document.getElementById('tipHdr');
-const tipRating= document.getElementById('tipRating');
-const tipBody  = document.getElementById('tipBody');
-const tipRefs  = document.getElementById('tipRefs');
-let activeCell = null;
-
-function showTip(chemName, matName, rating, entry, x, y, tabType) {
-  tipbox.className = 'tipbox visible r'+rating;
-  tipHdr.textContent = chemName + ' — ' + matName;
-  
-  if (tabType === 'adhesives') {
-    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Weak or unreliable bond':'No practical bond');
-  } else if (tabType === 'lubricants') {
-    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Fails (>5% / destroyed)');
-  } else {
-    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% / destroyed)');
-  }
-  
-  tipBody.textContent = entry.tip || '';
-
-  // Build clickable, numbered source links
-  tipRefs.innerHTML = '';
-  const refs = entry.references || [];
-  if (refs.length) {
-    const prefixText = document.createTextNode('Sources: ');
-    tipRefs.appendChild(prefixText);
-    refs.forEach((slug, i) => {
-      const r = DATA.references[slug];
-      const num = REF_INDEX[slug] || '?';
-      const label = r ? (r.authors ? r.authors + (r.year ? ' ' + r.year : '') : r.title) : slug;
-      const a = document.createElement('a');
-      a.textContent = label + ' [' + num + ']';
-      const prefix = tabType === 'adhesives' ? 'adhref-' : (tabType === 'lubricants' ? 'lubref-' : 'ref-');
-      a.href = '#' + prefix + slug;
-      a.dataset.refSlug = slug;
-      a.addEventListener('click', e => {
-        e.preventDefault();
-        hideTip();
-        highlightRef(slug, prefix);
-      });
-      tipRefs.appendChild(a);
-      if (i < refs.length - 1) tipRefs.appendChild(document.createTextNode('; '));
-    });
-  }
-
-  const pw=268,ph=160,vw=window.innerWidth,vh=window.innerHeight;
-  let tx=x+12,ty=y-10;
-  if(tx+pw>vw-8) tx=x-pw-12;
-  if(ty+ph>vh-8) ty=vh-ph-8;
-  if(ty<8) ty=8;
-  tipbox.style.left=tx+'px'; tipbox.style.top=ty+'px';
-}
-
-function highlightRef(slug, prefix = 'ref-') {
-  const li = document.getElementById(prefix + slug);
-  if (!li) return;
-  // Scroll into view only if not already visible
-  const rect = li.getBoundingClientRect();
-  const inView = rect.top >= 0 && rect.bottom <= window.innerHeight;
-  if (!inView) li.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  // Flash highlight
-  li.classList.remove('ref-highlight');
-  void li.offsetWidth; // force reflow to restart animation
-  li.classList.add('ref-highlight');
-  li.addEventListener('animationend', () => li.classList.remove('ref-highlight'), { once: true });
-}
-let tipHideTimer = null;
-
-function hideTip() {
-  clearTimeout(tipHideTimer);
-  tipbox.classList.remove('visible');
-  if (activeCell) { activeCell.classList.remove('active'); activeCell=null; }
-}
-function scheduledHide() {
-  tipHideTimer = setTimeout(hideTip, 180);
-}
-function cancelHide() {
-  clearTimeout(tipHideTimer);
-}
-
-// Keep tooltip open while mouse is over it
-tipbox.addEventListener('mouseenter', cancelHide);
-tipbox.addEventListener('mouseleave', scheduledHide);
-
-document.addEventListener('click', e => {
-  if (e.target.closest('td.has-tip')) return;
-  if (!tipbox.contains(e.target) && !(activeCell?.contains(e.target))) hideTip();
-});
-document.addEventListener('keydown', e => { if(e.key==='Escape') hideTip(); });
 
 // ── Theme toggle ──────────────────────────────────────────────────────────
 (function(){
