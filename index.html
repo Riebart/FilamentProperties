@@ -326,10 +326,62 @@ td.r .chip .conf-mark{position:absolute;top:1px;right:2px;font-size:.48rem;line-
 </div><!-- /tab-panel lubricants -->
 
 <div class="tab-panel" id="tab-adhesives">
-  <div class="tab-empty">
-    <strong>Adhesives compatibility</strong>
-    This tab will contain adhesive compatibility data (CA glue, epoxy, PVA, etc.) for each filament material.<br>
-    Data coming soon — contributions welcome via the repository.
+  <div class="controls" id="adh-controls">
+    <div class="ctrl-pill">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="adhSearchInput" placeholder="Search adhesive…" autocomplete="off">
+    </div>
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-pill">
+      <label><input type="checkbox" id="adhFilterCD"> Show only C / D rows</label>
+    </div>
+    <div class="ctrl-pill">
+      <label><input type="checkbox" id="adhFilterBest"> Best-material highlight</label>
+    </div>
+    <div class="ctrl-sep"></div>
+    <div class="ctrl-pill">
+      <span style="margin-right:.15rem">Cols:</span>
+      <div class="mat-btns">
+        <button id="adhShowAllBtn">All</button>
+        <span id="adhMatToggleRow"></span>
+      </div>
+    </div>
+  </div>
+  <div class="legend">
+    <div class="leg-item"><span class="leg-chip leg-A">A</span> Strong bond</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-B">B</span> Good / limited bond</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-C">C</span> Weak / cosmetic</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-D">D</span> Fails / no bond</div>
+    <div class="leg-sep"></div>
+    <div class="leg-item"><span class="leg-chip leg-none">–</span> No data</div>
+  </div>
+  <div class="card"><div class="scroll">
+    <table id="adhTable">
+      <thead><tr id="adhHeaderRow"><th>Adhesive</th></tr></thead>
+      <tbody id="adhTbody"></tbody>
+    </table>
+  </div></div>
+  <div class="panels">
+    <div class="panel">
+      <h3>Rating Scale (A–D)</h3>
+      <dl>
+        <dt class="dtA">A</dt><dd>Strong, durable bond with good long-term resistance to stress and common weather exposure.</dd>
+        <dt class="dtB">B</dt><dd>Good bond, but with meaningful limits in peel, weathering, creep, flexibility, or long-term durability.</dd>
+        <dt class="dtC">C</dt><dd>Weak or unreliable bond. Suitable mainly for light-duty, cosmetic, or well-supported joints.</dd>
+        <dt class="dtD">D</dt><dd>No practical bond or fundamentally poor substrate compatibility.</dd>
+      </dl>
+      <div class="conf-legend">
+        <div class="conf-item"><span style="font-family:'IBM Plex Mono',monospace;font-size:.8rem">†</span> measured / TDS</div>
+        <div class="conf-item"><span style="font-family:'IBM Plex Mono',monospace;font-size:.8rem">‡</span> interpolated / inferred</div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Sources</h3>
+      <ul id="adhRefList"></ul>
+    </div>
   </div>
 </div><!-- /tab-panel adhesives -->
 
@@ -481,7 +533,7 @@ const DATA = {
         "acetone": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Complete dissolution — acetone is intentionally used to smooth and bond ABS. Immersion causes full structural failure.",
+          "tip": "Complete dissolution \u2014 acetone is intentionally used to smooth and bond ABS. Immersion causes full structural failure.",
           "references": [
             "prusament_2021"
           ]
@@ -537,7 +589,7 @@ const DATA = {
         "dcm": {
           "rating": "D",
           "confidence": "inferred",
-          "tip": "DCM fully dissolves ABS — it is a stronger solvent than acetone for ABS and causes complete structural failure.",
+          "tip": "DCM fully dissolves ABS \u2014 it is a stronger solvent than acetone for ABS and causes complete structural failure.",
           "references": [
             "general_chem"
           ]
@@ -689,6 +741,113 @@ const DATA = {
           "tip": "Calcium/barium greases use a petroleum mineral oil carrier. Minor hydrocarbon attack on ABS possible with prolonged exposure.",
           "references": [
             "general_chem"
+          ]
+        }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": "Excellent fast structural bond. Solvent-like action on ABS/HIPS creates a very tight interface, though the cured joint is brittle under high impact or peel.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": "Excellent gap-filling bond. Gel chemistry allows alignment on mating parts but remains brittle under high impact.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Fills print gaps but provides poor structural strength. High-temp guns improve adhesion, but hot glue can easily warp thin walls.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Moisture-curing polyurethane forms a tough, creep-resistant bond. Far superior structural performance and heat resistance to EVA hot melt.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Strong bond. Solvent carrier slightly attacks the ABS surface to help create a very durable contact weld.",
+          "references": [
+            "formfutura_bonding_guide_2025",
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good for large flat areas and dampening vibrations, but poor on small, complex, or highly stressed joint surfaces.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Good structural bond on sanded surfaces, but has lower ultimate toughness and shear strength than 30-minute epoxy.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Excellent structural bond on sanded surfaces. Slow cure allows polymer cross-linking, providing high shear strength.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent toughness and gap filling, but bond quality varies. Requires moisture to cure; surfaces must be abraded.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Excellent heavy-duty bonding. Steel-filled epoxy matches the rigidity of these materials, providing high shear strength.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
           ]
         }
       }
@@ -920,7 +1079,7 @@ const DATA = {
         "petroleum_jelly": {
           "rating": "B",
           "confidence": "inferred",
-          "tip": "Similar to ABS — minor hydrocarbon attack possible with prolonged contact. Short-term lubrication use is acceptable.",
+          "tip": "Similar to ABS \u2014 minor hydrocarbon attack possible with prolonged contact. Short-term lubrication use is acceptable.",
           "references": [
             "general_chem"
           ]
@@ -1030,6 +1189,112 @@ const DATA = {
             "general_chem"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Strong, fast bond with good outdoor weathering resistance, but remains susceptible to brittle fracture under high peel stress.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Strong, gap-filling joint with good weather resistance; remains brittle under peel stress.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Fills print gaps but provides poor structural strength. High-temp guns improve adhesion, but hot glue can easily warp thin walls.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Moisture-curing polyurethane forms a tough, creep-resistant bond. Far superior structural performance and heat resistance to EVA hot melt.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good bond. Useful for large-area joints with high initial grab, but solvent can cause minor swelling during application.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good for large flat areas and dampening vibrations, but poor on small, complex, or highly stressed joint surfaces.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good structural bond on sanded surfaces, but has lower ultimate toughness and shear strength than 30-minute epoxy.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent structural bond on sanded surfaces. Slow cure allows polymer cross-linking, providing high shear strength.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent toughness and gap filling, but bond quality varies. Requires moisture to cure; surfaces must be abraded.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent heavy-duty bonding. Steel-filled epoxy matches the rigidity of these materials, providing high shear strength.",
+          "references": [
+            "general_chem"
+          ]
+        }
       }
     },
     "hips": {
@@ -1066,7 +1331,7 @@ const DATA = {
         "ipa_99": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete surface dissolution. Anhydrous IPA fully destroys HIPS — same mechanism as acetone on ABS.",
+          "tip": "Complete surface dissolution. Anhydrous IPA fully destroys HIPS \u2014 same mechanism as acetone on ABS.",
           "references": [
             "simplify3d_guide"
           ]
@@ -1130,7 +1395,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Sulfonation and severe surface degradation. Concentrated H₂SO₄ destroys HIPS rapidly.",
+          "tip": "Sulfonation and severe surface degradation. Concentrated H\u2082SO\u2084 destroys HIPS rapidly.",
           "references": [
             "kmac_hips"
           ]
@@ -1154,7 +1419,7 @@ const DATA = {
         "ethanol": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — HIPS dissolves readily in ethanol and other alcohols. Full structural collapse.",
+          "tip": "Complete dissolution \u2014 HIPS dissolves readily in ethanol and other alcohols. Full structural collapse.",
           "references": [
             "simplify3d_guide"
           ]
@@ -1162,7 +1427,7 @@ const DATA = {
         "acetone": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — HIPS is a styrene copolymer and dissolves rapidly in acetone, similar to ABS.",
+          "tip": "Complete dissolution \u2014 HIPS is a styrene copolymer and dissolves rapidly in acetone, similar to ABS.",
           "references": [
             "simplify3d_guide"
           ]
@@ -1170,7 +1435,7 @@ const DATA = {
         "flux_remover": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — HIPS is vulnerable to both alcohol and ester solvents present in most flux removers.",
+          "tip": "Complete dissolution \u2014 HIPS is vulnerable to both alcohol and ester solvents present in most flux removers.",
           "references": [
             "mg_chemicals_tds",
             "simplify3d_guide"
@@ -1211,7 +1476,7 @@ const DATA = {
         "limonene": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — d-Limonene is the primary intended solvent for HIPS supports. Full structural breakdown occurs with prolonged immersion. Brief exposure (10–20 s) loosens supports without full dissolution of nearby parts.",
+          "tip": "Complete dissolution \u2014 d-Limonene is the primary intended solvent for HIPS supports. Full structural breakdown occurs with prolonged immersion. Brief exposure (10\u201320 s) loosens supports without full dissolution of nearby parts.",
           "references": [
             "prusa_kb_hips"
           ]
@@ -1370,6 +1635,112 @@ const DATA = {
             "general_chem"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent fast structural bond. Solvent-like action on ABS/HIPS creates a very tight interface, though the cured joint is brittle under high impact or peel.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent gap-filling bond. Gel chemistry allows alignment on mating parts but remains brittle under high impact.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Fills print gaps but provides poor structural strength. High-temp guns improve adhesion, but hot glue can easily warp thin walls.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good adhesion and toughness. Reactive polyurethane provides durable, semi-flexible bonding with moderate heat resistance.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent bond. Solvent carrier lightly attacks polystyrene, creating a very strong, cohesive joint.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good for large flat areas and dampening vibrations, but poor on small, complex, or highly stressed joint surfaces.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Moderate structural bond. Requires coarse (100 grit) sanding to provide mechanical interlock; weaker than CA or solvent welding.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent structural bond but requires coarse (100-grit) sanding. PLA/PETG bond strength is lower than CA or solvent welding.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent toughness and gap filling, but bond quality varies. Requires moisture to cure; surfaces must be abraded.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Strong, steel-filled epoxy. Good for heavy-duty joints but requires thorough sanding and rigid parts.",
+          "references": [
+            "general_chem"
+          ]
+        }
       }
     },
     "pa": {
@@ -1437,7 +1808,7 @@ const DATA = {
         "hcl_37": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Severe — HCl protonates amide groups in nylon causing rapid hydrolysis and dissolution. Major weight gain and structural failure.",
+          "tip": "Severe \u2014 HCl protonates amide groups in nylon causing rapid hydrolysis and dissolution. Major weight gain and structural failure.",
           "references": [
             "prusament_2021"
           ]
@@ -1453,7 +1824,7 @@ const DATA = {
         "h3po4_85": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Severe — phosphoric acid attacks nylon amide bonds causing hydrolysis. Part swells significantly and loses all structural strength.",
+          "tip": "Severe \u2014 phosphoric acid attacks nylon amide bonds causing hydrolysis. Part swells significantly and loses all structural strength.",
           "references": [
             "prusament_2021"
           ]
@@ -1461,7 +1832,7 @@ const DATA = {
         "hno3_69": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Complete attack — nitric acid rapidly destroys nylon via oxidation and hydrolysis. Complete part failure.",
+          "tip": "Complete attack \u2014 nitric acid rapidly destroys nylon via oxidation and hydrolysis. Complete part failure.",
           "references": [
             "prusament_2021"
           ]
@@ -1469,7 +1840,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Complete destruction — sulphuric acid hydrolyzes and protonates nylon rapidly. Part dissolves / fully decomposes.",
+          "tip": "Complete destruction \u2014 sulphuric acid hydrolyzes and protonates nylon rapidly. Part dissolves / fully decomposes.",
           "references": [
             "prusament_2021"
           ]
@@ -1533,7 +1904,7 @@ const DATA = {
         "naoh_10": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Significant — NaOH hydrolyzes nylon amide bonds at even low concentrations. Prolonged exposure causes surface degradation and loss of strength.",
+          "tip": "Significant \u2014 NaOH hydrolyzes nylon amide bonds at even low concentrations. Prolonged exposure causes surface degradation and loss of strength.",
           "references": [
             "graco_compat"
           ]
@@ -1710,6 +2081,113 @@ const DATA = {
             "calpaclab_nylon"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Bonds quickly at first, but nylon moisture cycling and hygroscopic expansion weakens the brittle CA bond line over time; avoid for long-term stressed outdoor assemblies.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Initial gap-filling bond is strong, but nylon's moisture cycling degrades the brittle CA bond line over time.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak structural bond. Hot melt does not wet semi-crystalline nylon surfaces well, making the joint easy to peel apart.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent structural bond. Reactive polyurethane chemistry handles nylon better than CA, though moisture control during cure is critical.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No practical bond. Contact cement cannot wet or adhere to these highly inert or low-surface-energy materials.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak bond. Tape struggles to wet or adhere reliably to textured, semi-crystalline, or flexible print surfaces under load.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Decent bond on sanded nylon, but quick-cure epoxy is more brittle and has lower shear strength than slow-set epoxy.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Strong structural bond. Sanding is critical to provide mechanical interlock. Performs very well on nylon.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "uv_resin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. UV light cannot penetrate the joint well, and resin does not adhere to nylon.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": "Bonds nylon reasonably well, but moisture absorption of nylon makes the cure process tricky to control.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Strong structural bond, but standard unfilled structural epoxy (30-minute) is usually preferred for nylon interfaces.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        }
       }
     },
     "pa12": {
@@ -1795,7 +2273,7 @@ const DATA = {
         "h3po4_85": {
           "rating": "B",
           "confidence": "tds",
-          "tip": "Moderate attack. PA12's lower amide density reduces severity vs. PA6 but concentrated H₃PO₄ still causes measurable degradation.",
+          "tip": "Moderate attack. PA12's lower amide density reduces severity vs. PA6 but concentrated H\u2083PO\u2084 still causes measurable degradation.",
           "references": [
             "smithmetal_pa12"
           ]
@@ -1811,7 +2289,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Severe — concentrated H₂SO₄ causes rapid hydrolysis and protonation of PA12 amide groups. Complete structural failure.",
+          "tip": "Severe \u2014 concentrated H\u2082SO\u2084 causes rapid hydrolysis and protonation of PA12 amide groups. Complete structural failure.",
           "references": [
             "smithmetal_pa12"
           ]
@@ -2050,6 +2528,113 @@ const DATA = {
             "calpaclab_nylon"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Bonds quickly at first, but nylon moisture cycling and hygroscopic expansion weakens the brittle CA bond line over time; avoid for long-term stressed outdoor assemblies.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Initial gap-filling bond is strong, but nylon's moisture cycling degrades the brittle CA bond line over time.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak structural bond. Hot melt does not wet semi-crystalline nylon surfaces well, making the joint easy to peel apart.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent structural bond. Reactive polyurethane chemistry handles nylon better than CA, though moisture control during cure is critical.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No practical bond. Contact cement cannot wet or adhere to these highly inert or low-surface-energy materials.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak bond. Tape struggles to wet or adhere reliably to textured, semi-crystalline, or flexible print surfaces under load.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Decent bond on sanded nylon, but quick-cure epoxy is more brittle and has lower shear strength than slow-set epoxy.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Strong structural bond. Sanding is critical to provide mechanical interlock. Performs very well on nylon.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "uv_resin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. UV light cannot penetrate the joint well, and resin does not adhere to nylon.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": "Bonds nylon reasonably well, but moisture absorption of nylon makes the cure process tricky to control.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Strong structural bond, but standard unfilled structural epoxy (30-minute) is usually preferred for nylon interfaces.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        }
       }
     },
     "pc": {
@@ -2149,7 +2734,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Catastrophic surface attack. H₂SO₄ sulfonates PC's aromatic groups causing extreme embrittlement and crumbling.",
+          "tip": "Catastrophic surface attack. H\u2082SO\u2084 sulfonates PC's aromatic groups causing extreme embrittlement and crumbling.",
           "references": [
             "prusament_2021"
           ]
@@ -2237,7 +2822,7 @@ const DATA = {
         "dcm": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "DCM fully dissolves polycarbonate — it is a primary industrial solvent used for PC bonding, machining, and smoothing. Complete structural failure on immersion.",
+          "tip": "DCM fully dissolves polycarbonate \u2014 it is a primary industrial solvent used for PC bonding, machining, and smoothing. Complete structural failure on immersion.",
           "references": [
             "general_chem"
           ]
@@ -2388,6 +2973,112 @@ const DATA = {
             "general_chem"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Very strong, fast-curing bond. Performs well under shear, but PC's toughness makes the brittle CA joint the weak point under impact.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Very strong bond with good gap-filling behavior. Slower cure allows part adjustment, but joint is brittle under impact.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Fills print gaps but provides poor structural strength. High-temp guns improve adhesion, but hot glue can easily warp thin walls.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Moisture-curing polyurethane forms a tough, creep-resistant bond. Far superior structural performance and heat resistance to EVA hot melt.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good bond. Useful for large-area joints with high initial grab, but solvent can cause minor swelling during application.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good for large flat areas and dampening vibrations, but poor on small, complex, or highly stressed joint surfaces.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good structural bond on sanded surfaces, but has lower ultimate toughness and shear strength than 30-minute epoxy.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent structural bond on sanded surfaces. Slow cure allows polymer cross-linking, providing high shear strength.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent toughness and gap filling, but bond quality varies. Requires moisture to cure; surfaces must be abraded.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent heavy-duty bonding. Steel-filled epoxy matches the rigidity of these materials, providing high shear strength.",
+          "references": [
+            "general_chem"
+          ]
+        }
       }
     },
     "petg": {
@@ -2471,7 +3162,7 @@ const DATA = {
         "h3po4_85": {
           "rating": "C",
           "confidence": "measured",
-          "tip": "Surface pitting and weight gain at 4–5% range. Concentrated phosphoric acid attacks PETG over prolonged exposure.",
+          "tip": "Surface pitting and weight gain at 4\u20135% range. Concentrated phosphoric acid attacks PETG over prolonged exposure.",
           "references": [
             "prusament_2021"
           ]
@@ -2519,7 +3210,7 @@ const DATA = {
         "acetone": {
           "rating": "C",
           "confidence": "measured",
-          "tip": "Significant surface crazing and swelling (4–5%). Acetone does not fully dissolve PETG but causes surface whitening, cracking, and embrittlement.",
+          "tip": "Significant surface crazing and swelling (4\u20135%). Acetone does not fully dissolve PETG but causes surface whitening, cracking, and embrittlement.",
           "references": [
             "prusament_2021"
           ]
@@ -2576,7 +3267,7 @@ const DATA = {
         "dcm": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — DCM is the only practical solvent for PETG. Used in laboratory smoothing only. Highly toxic; requires fume hood and PPE.",
+          "tip": "Complete dissolution \u2014 DCM is the only practical solvent for PETG. Used in laboratory smoothing only. Highly toxic; requires fume hood and PPE.",
           "references": [
             "prusa_kb_petg"
           ]
@@ -2728,6 +3419,112 @@ const DATA = {
             "fb_petg_grease"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": "Excellent bond strength on PETG, providing high moisture/water resistance, but remains brittle in thin layers under bending loads.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": "Excellent gap-filling bond on PETG. Strong and highly moisture-resistant, though brittle under high peel stress.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Fills print gaps but provides poor structural strength. High-temp guns improve adhesion, but hot glue can easily warp thin walls.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Moisture-curing polyurethane forms a tough, creep-resistant bond. Far superior structural performance and heat resistance to EVA hot melt.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Unreliable. PETG's high chemical resistance prevents the solvent carrier from attacking the surface, resulting in poor peel strength.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good for large flat areas and dampening vibrations, but poor on small, complex, or highly stressed joint surfaces.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Moderate structural bond. Requires coarse (100 grit) sanding to provide mechanical interlock; weaker than CA or solvent welding.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Decent structural bond but requires coarse (100-grit) sanding. PLA/PETG bond strength is lower than CA or solvent welding.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent toughness and gap filling, but bond quality varies. Requires moisture to cure; surfaces must be abraded.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Strong, steel-filled epoxy. Good for heavy-duty joints but requires thorough sanding and rigid parts.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024"
+          ]
+        }
       }
     },
     "pla": {
@@ -2747,7 +3544,7 @@ const DATA = {
         "ipa_75": {
           "rating": "C",
           "confidence": "measured",
-          "tip": "Surface becomes tacky with micro-crazing. Significant weight gain (4–5%) observed; surface gloss lost after extended exposure.",
+          "tip": "Surface becomes tacky with micro-crazing. Significant weight gain (4\u20135%) observed; surface gloss lost after extended exposure.",
           "references": [
             "prusament_2021"
           ]
@@ -2803,7 +3600,7 @@ const DATA = {
         "h2o2_30": {
           "rating": "B",
           "confidence": "measured",
-          "tip": "Moderate surface attack. Concentrated H₂O₂ combines oxidation with hydrolysis on PLA ester bonds; slight softening observed.",
+          "tip": "Moderate surface attack. Concentrated H\u2082O\u2082 combines oxidation with hydrolysis on PLA ester bonds; slight softening observed.",
           "references": [
             "prusament_2021"
           ]
@@ -2827,7 +3624,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Rapid hydrolysis and charring. Concentrated H₂SO₄ acts as both acid and dehydrating agent; PLA fully destroyed.",
+          "tip": "Rapid hydrolysis and charring. Concentrated H\u2082SO\u2084 acts as both acid and dehydrating agent; PLA fully destroyed.",
           "references": [
             "prusament_2021"
           ]
@@ -2875,7 +3672,7 @@ const DATA = {
         "brake_fluid_dot34": {
           "rating": "D",
           "confidence": "inferred",
-          "tip": "Severe degradation — glycol ethers and residual water in brake fluid aggressively attack PLA's ester linkages. Part softens and deforms.",
+          "tip": "Severe degradation \u2014 glycol ethers and residual water in brake fluid aggressively attack PLA's ester linkages. Part softens and deforms.",
           "references": [
             "reddit_brakefluid_2023",
             "general_chem"
@@ -2892,7 +3689,7 @@ const DATA = {
         "naoh_10": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete destruction — NaOH rapidly hydrolyzes PLA's ester bonds causing rapid dissolution. PLA has no resistance to strong alkalis.",
+          "tip": "Complete destruction \u2014 NaOH rapidly hydrolyzes PLA's ester bonds causing rapid dissolution. PLA has no resistance to strong alkalis.",
           "references": [
             "general_chem"
           ]
@@ -2924,7 +3721,7 @@ const DATA = {
         "thf": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "THF fully dissolves PLA. Prusa Knowledge Base confirms chloroform, hot benzene, and THF as PLA solvents — lab use only with fume hood and PPE.",
+          "tip": "THF fully dissolves PLA. Prusa Knowledge Base confirms chloroform, hot benzene, and THF as PLA solvents \u2014 lab use only with fume hood and PPE.",
           "references": [
             "prusa_kb_pla"
           ]
@@ -2932,7 +3729,7 @@ const DATA = {
         "chloroform": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Chloroform fully dissolves PLA. Prusa Knowledge Base confirms chloroform as a PLA solvent — lab use only, toxic and suspected carcinogen.",
+          "tip": "Chloroform fully dissolves PLA. Prusa Knowledge Base confirms chloroform as a PLA solvent \u2014 lab use only, toxic and suspected carcinogen.",
           "references": [
             "prusa_kb_pla"
           ]
@@ -3068,6 +3865,117 @@ const DATA = {
             "general_chem"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Strong, fast bond on rigid PLA when surfaces are clean and lightly abraded. Thin CA often reaches substrate failure before glue failure, but remains brittle in peel and impact.",
+          "references": [
+            "instructables_pla_glue_test_2020",
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Strong, gap-filling bond. Slower set time allows alignment, but the joint remains brittle under peel and impact loads.",
+          "references": [
+            "instructables_pla_glue_test_2020",
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "B",
+          "confidence": "tds",
+          "tip": "Works best with high-temp glue guns around 160\u2013200C. Standard low-temp guns bond weakly, and the joint is not a true weld.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "A",
+          "confidence": "tds",
+          "tip": "Moisture-curing polyurethane forms a tough, creep-resistant bond. Far superior structural performance and heat resistance to EVA hot melt.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "A",
+          "confidence": "measured",
+          "tip": "Excellent initial tack and bond strength on rigid PLA. Often reaches substrate failure before the bond line fails.",
+          "references": [
+            "instructables_pla_glue_test_2020"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak bond. Tape struggles to wet or adhere reliably to textured, semi-crystalline, or flexible print surfaces under load.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Moderate structural bond. Requires coarse (100 grit) sanding to provide mechanical interlock; weaker than CA or solvent welding.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024",
+            "instructables_pla_glue_test_2020"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Decent structural bond but requires coarse (100-grit) sanding. PLA/PETG bond strength is lower than CA or solvent welding.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024",
+            "instructables_pla_glue_test_2020"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Very weak. Water-based adhesive has poor structural adhesion to thermoplastics; suitable only for temporary, light cosmetic bonding.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Good toughness and fills gaps as it foams, but ultimate strength on PLA is below CA or epoxy; sanding improves bond.",
+          "references": [
+            "instructables_pla_glue_test_2020"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "B",
+          "confidence": "measured",
+          "tip": "Strong, steel-filled epoxy. Good for heavy-duty joints but requires thorough sanding and rigid parts.",
+          "references": [
+            "jcrocket_epoxy_bonding_2024",
+            "instructables_pla_glue_test_2020"
+          ]
+        }
       }
     },
     "pom": {
@@ -3145,7 +4053,7 @@ const DATA = {
         "h2o2_30": {
           "rating": "B",
           "confidence": "tds",
-          "tip": "Moderate oxidative attack on POM surface. H₂O₂ causes measurable weight gain and surface dulling.",
+          "tip": "Moderate oxidative attack on POM surface. H\u2082O\u2082 causes measurable weight gain and surface dulling.",
           "references": [
             "kmac_pom"
           ]
@@ -3170,7 +4078,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "C",
           "confidence": "tds",
-          "tip": "Catastrophic depolymerization. Concentrated H₂SO₄ causes immediate breakdown of POM into formaldehyde; part is destroyed.",
+          "tip": "Catastrophic depolymerization. Concentrated H\u2082SO\u2084 causes immediate breakdown of POM into formaldehyde; part is destroyed.",
           "references": [
             "kmac_pom",
             "ism_pom"
@@ -3236,7 +4144,7 @@ const DATA = {
         "naoh_10": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete destruction — NaOH depolymerizes POM at chain ends (end-group unzipping) causing rapid dissolution. POM has zero alkali resistance.",
+          "tip": "Complete destruction \u2014 NaOH depolymerizes POM at chain ends (end-group unzipping) causing rapid dissolution. POM has zero alkali resistance.",
           "references": [
             "kmac_pom",
             "ism_pom"
@@ -3411,6 +4319,124 @@ const DATA = {
           "tip": null,
           "references": [
             "microtonano_pa66"
+          ]
+        }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Poor adhesion. Extremely low surface energy prevents cyanoacrylate from wetting the substrate, leading to immediate peeling without specialty primers.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "ca_gel": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. POM and PP's low surface energy resists wetting, causing the gel CA to peel off cleanly.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Very poor adhesion. EVA hot melt cannot wet low-surface-energy POM or PP, resulting in no practical bond.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Poor adhesion. Low-surface-energy POM and PP resist reactive hot melt bonding without specialized surface prep.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "contact_cement": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No practical bond. Contact cement cannot wet or adhere to these highly inert or low-surface-energy materials.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Will not stick. Low-surface-energy substrates resist pressure-sensitive adhesives; tape peels off easily.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. Epoxies cannot adhere to low-surface-energy POM or PP without industrial flame/plasma treatment.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. Epoxies cannot adhere to low-surface-energy POM or PP without industrial flame/plasma treatment.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No adhesion. Incompatible with low-surface-energy substrates.",
+          "references": [
+            "formfutura_bonding_guide_2025",
+            "general_chem"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Poor compatibility. Low-surface-energy plastics prevent moisture-cure polyurethane from wetting the surface.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. Low surface energy prevents wetting and adhesion of polyurethane sealants.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. Filled epoxy cannot wet or adhere to low-surface-energy POM or PP.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
           ]
         }
       }
@@ -3751,6 +4777,124 @@ const DATA = {
             "graco_compat"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Poor adhesion. Extremely low surface energy prevents cyanoacrylate from wetting the substrate, leading to immediate peeling without specialty primers.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "ca_gel": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. POM and PP's low surface energy resists wetting, causing the gel CA to peel off cleanly.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Very poor adhesion. EVA hot melt cannot wet low-surface-energy POM or PP, resulting in no practical bond.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Poor adhesion. Low-surface-energy POM and PP resist reactive hot melt bonding without specialized surface prep.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "contact_cement": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No practical bond. Contact cement cannot wet or adhere to these highly inert or low-surface-energy materials.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Will not stick. Low-surface-energy substrates resist pressure-sensitive adhesives; tape peels off easily.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. Epoxies cannot adhere to low-surface-energy POM or PP without industrial flame/plasma treatment.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. Epoxies cannot adhere to low-surface-energy POM or PP without industrial flame/plasma treatment.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No adhesion. Incompatible with low-surface-energy substrates.",
+          "references": [
+            "formfutura_bonding_guide_2025",
+            "general_chem"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Poor compatibility. Low-surface-energy plastics prevent moisture-cure polyurethane from wetting the surface.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. Low surface energy prevents wetting and adhesion of polyurethane sealants.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Does not bond. Filled epoxy cannot wet or adhere to low-surface-energy POM or PP.",
+          "references": [
+            "permabond_3d_bonding_2025",
+            "general_chem"
+          ]
+        }
       }
     },
     "pvb": {
@@ -3770,7 +4914,7 @@ const DATA = {
         "ipa_75": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Material dissolves rapidly — PVB is used intentionally as an IPA-soluble support. Complete structural breakdown within hours.",
+          "tip": "Material dissolves rapidly \u2014 PVB is used intentionally as an IPA-soluble support. Complete structural breakdown within hours.",
           "references": [
             "prusament_2021"
           ]
@@ -3778,7 +4922,7 @@ const DATA = {
         "ipa_91": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — PVB dissolves readily in IPA at all concentrations above ~50%.",
+          "tip": "Complete dissolution \u2014 PVB dissolves readily in IPA at all concentrations above ~50%.",
           "references": [
             "prusament_2021"
           ]
@@ -3834,7 +4978,7 @@ const DATA = {
         "ethanol": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Rapid dissolution — PVB is highly soluble in ethanol. Complete structural collapse within hours.",
+          "tip": "Rapid dissolution \u2014 PVB is highly soluble in ethanol. Complete structural collapse within hours.",
           "references": [
             "prusament_2021"
           ]
@@ -3850,7 +4994,7 @@ const DATA = {
         "flux_remover": {
           "rating": "D",
           "confidence": "tds",
-          "tip": "Complete dissolution — PVB dissolves in all IPA/alcohol-based flux removers.",
+          "tip": "Complete dissolution \u2014 PVB dissolves in all IPA/alcohol-based flux removers.",
           "references": [
             "mg_chemicals_tds"
           ]
@@ -3858,7 +5002,7 @@ const DATA = {
         "brake_fluid_dot34": {
           "rating": "D",
           "confidence": "inferred",
-          "tip": "Complete dissolution — PVB is highly susceptible to polyglycol ether solvents in brake fluid.",
+          "tip": "Complete dissolution \u2014 PVB is highly susceptible to polyglycol ether solvents in brake fluid.",
           "references": [
             "general_chem"
           ]
@@ -4049,6 +5193,112 @@ const DATA = {
             "general_chem"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good bond strength, but PVB is highly sensitive to the carrier chemicals and can experience stress cracking or softening near the joint.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good gap-filling bond, but PVB is sensitive to CA solvents and can experience stress cracking or softening near the joint.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Fills print gaps but provides poor structural strength. High-temp guns improve adhesion, but hot glue can easily warp thin walls.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good adhesion and toughness. Reactive polyurethane provides durable, semi-flexible bonding with moderate heat resistance.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good bond. Useful for large-area joints with high initial grab, but solvent can cause minor swelling during application.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak bond. Tape struggles to wet or adhere reliably to textured, semi-crystalline, or flexible print surfaces under load.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Moderate structural bond. Requires coarse (100 grit) sanding to provide mechanical interlock; weaker than CA or solvent welding.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent structural bond but requires coarse (100-grit) sanding. PLA/PETG bond strength is lower than CA or solvent welding.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "C",
+          "confidence": "tds",
+          "tip": "Weak bond. Useful mainly for cosmetic seam-filling or temporary tack-up. Lack of penetration makes it poor for structural use.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak bond. Suitable only for non-structural mockups.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Decent toughness and gap filling, but bond quality varies. Requires moisture to cure; surfaces must be abraded.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Highly flexible joint with excellent weather resistance. Great for outdoor sealing but lacks structural stiffness.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Strong, steel-filled epoxy. Good for heavy-duty joints but requires thorough sanding and rigid parts.",
+          "references": [
+            "general_chem"
+          ]
+        }
       }
     },
     "tpu_95a": {
@@ -4069,7 +5319,7 @@ const DATA = {
         "ipa_75": {
           "rating": "C",
           "confidence": "measured",
-          "tip": "Surface softening and swelling (~10–15% volume change) after extended immersion. Elasticity and tensile strength reduce significantly.",
+          "tip": "Surface softening and swelling (~10\u201315% volume change) after extended immersion. Elasticity and tensile strength reduce significantly.",
           "references": [
             "forerunner_tpu_2025"
           ]
@@ -4150,7 +5400,7 @@ const DATA = {
         "h2so4_96": {
           "rating": "D",
           "confidence": "inferred",
-          "tip": "Complete structural failure. Concentrated H₂SO₄ hydrolyzes urethane bonds and oxidizes the polymer backbone; rapid dissolution observed.",
+          "tip": "Complete structural failure. Concentrated H\u2082SO\u2084 hydrolyzes urethane bonds and oxidizes the polymer backbone; rapid dissolution observed.",
           "references": [
             "basf_elastollan"
           ]
@@ -4182,7 +5432,7 @@ const DATA = {
         "acetone": {
           "rating": "D",
           "confidence": "measured",
-          "tip": "Complete failure — acetone fully penetrates TPU causing massive swelling and dissolution of soft segments. Part loses all structural integrity.",
+          "tip": "Complete failure \u2014 acetone fully penetrates TPU causing massive swelling and dissolution of soft segments. Part loses all structural integrity.",
           "references": [
             "forerunner_tpu_2025"
           ]
@@ -4390,6 +5640,112 @@ const DATA = {
             "general_chem"
           ]
         }
+      },
+      "adhesives": {
+        "ca_thin": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Forms a fast bond, but cured CA is rigid and will crack, peel, or delaminate quickly when the flexible TPU joint is subjected to bending or flexing.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "ca_gel": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Gel CA fills surface ridges on TPU, but the cured glue line is rigid and will crack or peel when the flexible part is flexed.",
+          "references": [
+            "permabond_3d_bonding_2025"
+          ]
+        },
+        "eva_hot_melt": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Provides a flexible joint, but peel strength is very weak, causing the bond to fail easily under bending stresses.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pur_hot_melt": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good compatibility. Polyurethane-based adhesive matches TPU chemistry well, providing a tough, highly flexible joint.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "contact_cement": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Initial bond is flexible, but solvent carrier can swell TPU, and peel resistance is low on flexible joints.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "adhesive_tape_high_tack": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Weak bond. Tape struggles to wet or adhere reliably to textured, semi-crystalline, or flexible print surfaces under load.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_5min": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Rigid quick-cure epoxy is incompatible with TPU's flexibility; the bond line will delaminate when flexed.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "epoxy_30min": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Rigid epoxy is incompatible with TPU's flexibility; the bond line will delaminate when flexed.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "uv_resin": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "Brittle resin cracks immediately when flexible TPU is flexed or bent.",
+          "references": [
+            "formfutura_bonding_guide_2025"
+          ]
+        },
+        "pva_glue": {
+          "rating": "D",
+          "confidence": "inferred",
+          "tip": "No bond. PVA does not wet or stick to these non-porous thermoplastics; peels off effortlessly when dry.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_adhesive": {
+          "rating": "B",
+          "confidence": "inferred",
+          "tip": "Good compatibility. Polyurethane-based adhesive matches TPU's chemical family, providing decent flexibility and adhesion.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "polyurethane_sealant": {
+          "rating": "A",
+          "confidence": "inferred",
+          "tip": "Excellent compatibility. Flexible sealant bonds very well to flexible TPU, maintaining elastomeric joint integrity.",
+          "references": [
+            "general_chem"
+          ]
+        },
+        "jb_weld": {
+          "rating": "C",
+          "confidence": "inferred",
+          "tip": "Rigid filled epoxy will crack and delaminate when flexible TPU is subjected to bending stress.",
+          "references": [
+            "general_chem"
+          ]
+        }
       }
     }
   },
@@ -4397,7 +5753,7 @@ const DATA = {
     "water": {
       "name": "Water",
       "aka": [
-        "H₂O"
+        "H\u2082O"
       ],
       "notes": "Deionised or tap water, room temperature."
     },
@@ -4406,7 +5762,7 @@ const DATA = {
       "aka": [
         "Isopropyl alcohol 75%",
         "Isopropanol 75%",
-        "C₃H₈O"
+        "C\u2083H\u2088O"
       ],
       "notes": "75% v/v isopropyl alcohol in water. Common hand sanitiser and surface disinfectant concentration."
     },
@@ -4415,7 +5771,7 @@ const DATA = {
       "aka": [
         "Isopropyl alcohol 91%",
         "Isopropanol 91%",
-        "C₃H₈O"
+        "C\u2083H\u2088O"
       ],
       "notes": "91% v/v isopropyl alcohol. Most common electronics cleaning and FPV shop concentration."
     },
@@ -4424,7 +5780,7 @@ const DATA = {
       "aka": [
         "Isopropyl alcohol 99%",
         "Anhydrous isopropanol",
-        "C₃H₈O"
+        "C\u2083H\u2088O"
       ],
       "notes": "Near-anhydrous IPA. More aggressive than dilute forms due to absence of water."
     },
@@ -4433,7 +5789,7 @@ const DATA = {
       "aka": [
         "Vinegar",
         "Ethanoic acid 8%",
-        "C₂H₄O₂"
+        "C\u2082H\u2084O\u2082"
       ],
       "notes": "~8% acetic acid solution, equivalent to household white vinegar."
     },
@@ -4449,7 +5805,7 @@ const DATA = {
     "citric_acid": {
       "name": "Citric acid",
       "aka": [
-        "C₆H₈O₇",
+        "C\u2086H\u2088O\u2087",
         "Lemon salt"
       ],
       "notes": "Saturated or 10% citric acid solution."
@@ -4466,14 +5822,14 @@ const DATA = {
     "h2o2_30": {
       "name": "Hydrogen peroxide 30%",
       "aka": [
-        "H₂O₂ 30%"
+        "H\u2082O\u2082 30%"
       ],
       "notes": "30% w/v hydrogen peroxide. Strong oxidising agent; well above household 3% concentration."
     },
     "h3po4_85": {
       "name": "Phosphoric acid 85%",
       "aka": [
-        "H₃PO₄",
+        "H\u2083PO\u2084",
         "Orthophosphoric acid"
       ],
       "notes": "85% w/w phosphoric acid. Used in rust converters and electronics PCB cleaning."
@@ -4481,7 +5837,7 @@ const DATA = {
     "hno3_69": {
       "name": "Nitric acid 69%",
       "aka": [
-        "HNO₃",
+        "HNO\u2083",
         "Aqua fortis"
       ],
       "notes": "69% w/w nitric acid. Strong oxidising acid; highly aggressive toward most organic polymers."
@@ -4489,7 +5845,7 @@ const DATA = {
     "h2so4_96": {
       "name": "Sulphuric acid 96%",
       "aka": [
-        "H₂SO₄",
+        "H\u2082SO\u2084",
         "Sulfuric acid",
         "Oil of vitriol"
       ],
@@ -4499,7 +5855,7 @@ const DATA = {
       "name": "Fridex / Ethylene glycol",
       "aka": [
         "Fridex",
-        "C₂H₆O₂",
+        "C\u2082H\u2086O\u2082",
         "MEG",
         "Antifreeze"
       ],
@@ -4519,7 +5875,7 @@ const DATA = {
       "name": "Ethanol",
       "aka": [
         "Ethyl alcohol",
-        "C₂H₆O",
+        "C\u2082H\u2086O",
         "Methylated spirits (denatured)"
       ],
       "notes": "Absolute or near-absolute ethanol."
@@ -4528,7 +5884,7 @@ const DATA = {
       "name": "Acetone",
       "aka": [
         "Propanone",
-        "C₃H₆O",
+        "C\u2083H\u2086O",
         "Nail polish remover"
       ],
       "notes": "Pure acetone. Common solvent; intentionally used to smooth ABS."
@@ -4585,7 +5941,7 @@ const DATA = {
         "Citrus solvent",
         "D-Limonene",
         "Dipentene",
-        "C₁₀H₁₆"
+        "C\u2081\u2080H\u2081\u2086"
       ],
       "notes": "Terpene solvent derived from citrus peel. Primary solvent used to dissolve HIPS supports in dual-extrusion printing. Relatively low toxicity compared to chlorinated solvents but is a skin/respiratory irritant. Not flammable at room temperature."
     },
@@ -4594,27 +5950,27 @@ const DATA = {
       "aka": [
         "DCM",
         "Methylene chloride",
-        "CH₂Cl₂",
+        "CH\u2082Cl\u2082",
         "Methylene dichloride"
       ],
-      "notes": "Chlorinated solvent. Dissolves PETG, PC, and many other polymers. Suspected carcinogen; regulated in many jurisdictions. Lab use only — use in fume hood with appropriate PPE."
+      "notes": "Chlorinated solvent. Dissolves PETG, PC, and many other polymers. Suspected carcinogen; regulated in many jurisdictions. Lab use only \u2014 use in fume hood with appropriate PPE."
     },
     "thf": {
       "name": "Tetrahydrofuran",
       "aka": [
         "THF",
         "Oxolane",
-        "C₄H₈O"
+        "C\u2084H\u2088O"
       ],
       "notes": "Cyclic ether solvent. Dissolves PLA and many engineering polymers. Highly flammable; forms explosive peroxides on storage. Lab use only."
     },
     "chloroform": {
       "name": "Chloroform",
       "aka": [
-        "CHCl₃",
+        "CHCl\u2083",
         "Trichloromethane"
       ],
-      "notes": "Chlorinated solvent. Dissolves PLA and many polymers. Toxic — CNS depressant and suspected carcinogen. Lab use only — fume hood and PPE required."
+      "notes": "Chlorinated solvent. Dissolves PLA and many polymers. Toxic \u2014 CNS depressant and suspected carcinogen. Lab use only \u2014 fume hood and PPE required."
     }
   },
   "references": {
@@ -4626,11 +5982,11 @@ const DATA = {
       "notes": "7-day laboratory immersion study. Weight and dimensional change measured. Covers PLA, PVB, PETG, ASA, ABS, PC, PA, PP. Primary and most rigorous source in this dataset."
     },
     "forerunner_tpu_2025": {
-      "title": "ESTANE M95A TPU Chemical Compatibility — 4-Week Immersion Test",
+      "title": "ESTANE M95A TPU Chemical Compatibility \u2014 4-Week Immersion Test",
       "authors": "Forerunner 3D",
       "year": 2025,
       "url": "https://forerunner3d.com/",
-      "notes": "4-week immersion test for TPU 95A. Ratings mapped from 1–4 scale to A–D."
+      "notes": "4-week immersion test for TPU 95A. Ratings mapped from 1\u20134 scale to A\u2013D."
     },
     "ultimaker_tpu_tds": {
       "title": "Ultimaker TPU 95A Technical Data Sheet",
@@ -4710,7 +6066,7 @@ const DATA = {
       "notes": "Solvent composition data for IPA/ethanol/ethyl acetate-based flux removers. Used to assess flux remover aggressiveness toward filament materials."
     },
     "reddit_brakefluid_2023": {
-      "title": "Brake fluid effects on PETG and ABS — community immersion reports",
+      "title": "Brake fluid effects on PETG and ABS \u2014 community immersion reports",
       "authors": "r/3Dprinting community",
       "year": 2023,
       "url": "https://www.reddit.com/r/3Dprinting/comments/158iuqk/brake_fluid_effects_on_petg_and_abs/",
@@ -4728,24 +6084,24 @@ const DATA = {
       "authors": null,
       "year": null,
       "url": null,
-      "notes": "Ratings inferred from known polymer chemistry principles — solubility parameters, functional group reactivity, and plasticizer theory. No single citable source. Lowest confidence tier; used only when no TDS or immersion data was available."
+      "notes": "Ratings inferred from known polymer chemistry principles \u2014 solubility parameters, functional group reactivity, and plasticizer theory. No single citable source. Lowest confidence tier; used only when no TDS or immersion data was available."
     },
     "prusa_kb_hips": {
-      "title": "HIPS — Prusa Knowledge Base",
+      "title": "HIPS \u2014 Prusa Knowledge Base",
       "authors": "Prusa Research",
       "year": 2021,
       "url": "https://help.prusa3d.com/article/hips_167118",
       "notes": "Prusa material guide for HIPS. Confirms d-Limonene as primary solvent for support removal. Explicitly warns ASA and some ABS filaments are also partially dissolved by limonene."
     },
     "prusa_kb_petg": {
-      "title": "PETG — Prusa Knowledge Base",
+      "title": "PETG \u2014 Prusa Knowledge Base",
       "authors": "Prusa Research",
       "year": 2021,
       "url": "https://help.prusa3d.com/article/petg_2059",
       "notes": "Confirms DCM (dichloromethane) as the only practical solvent for PETG smoothing. Lab use only."
     },
     "prusa_kb_pla": {
-      "title": "PLA — Prusa Knowledge Base",
+      "title": "PLA \u2014 Prusa Knowledge Base",
       "authors": "Prusa Research",
       "year": 2021,
       "url": "https://help.prusa3d.com/article/pla_2062",
@@ -4759,28 +6115,28 @@ const DATA = {
       "notes": "Comprehensive resistance chart covering ABS, Acetal/POM, Nylon, PC, PP, PET and many others across hundreds of chemicals."
     },
     "microtonano_pa66": {
-      "title": "Chemical Compatibility Plastic Material Chart — PA66, PEEK, PPS, PVDF, POM",
+      "title": "Chemical Compatibility Plastic Material Chart \u2014 PA66, PEEK, PPS, PVDF, POM",
       "authors": "Micro to Nano",
       "year": 2019,
       "url": "https://www.microtonano.com/download/Chemical_compatibility_plastic_material_chart_ca_cp_lc_st_gn.pdf",
       "notes": "Engineering polymer chemical resistance reference covering PA66, PEEK, PPS, PVDF and POM including mineral oil, silicone oil, petroleum, greases."
     },
     "prusa_forum_lubricants": {
-      "title": "Grease vs PTFE dry oil — Prusa3D Forum",
+      "title": "Grease vs PTFE dry oil \u2014 Prusa3D Forum",
       "authors": "Prusa Community",
       "year": 2020,
       "url": "https://forum.prusa3d.com/forum/general-discussion-announcements-and-releases/grease-vs-ptfe-dry-oil/",
       "notes": "Community discussion on lubricant compatibility with printed parts. Notes PTFE spray may contain petroleum carriers, recommends lithium grease as safest general option."
     },
     "reddit_3dp_lubricants": {
-      "title": "Recommended lubricants for PLA — Reddit r/3Dprinting",
+      "title": "Recommended lubricants for PLA \u2014 Reddit r/3Dprinting",
       "authors": "Reddit Community",
       "year": 2022,
       "url": "https://www.reddit.com/r/3Dprinting/comments/yijf7g/recommended_lubricants_for_pla/",
       "notes": "Community consensus: PLA is resistant to petroleum greases including vaseline/petroleum jelly; silicone grease safe for all common filaments."
     },
     "fb_petg_grease": {
-      "title": "What kind of grease is safe for PETG? — Facebook 3D Printing Group",
+      "title": "What kind of grease is safe for PETG? \u2014 Facebook 3D Printing Group",
       "authors": "Facebook Community",
       "year": 2023,
       "url": "https://www.facebook.com/groups/1655036618068474/posts/3541017542803696/",
@@ -4792,6 +6148,34 @@ const DATA = {
       "year": 2022,
       "url": "https://www.calpaclab.com/nylon-chemical-compatibility-chart/",
       "notes": "Nylon (PA) chemical compatibility reference including mineral oil, petroleum jelly, silicone oil, and various greases."
+    },
+    "permabond_3d_bonding_2025": {
+      "title": "How to bond 3D printed parts",
+      "authors": "Permabond",
+      "year": 2025,
+      "url": "https://permabond.com/how-to-bond-3d-printed-parts/",
+      "notes": "Guidance on bonding PLA, ABS, PETG, PP and nylon; includes notes on cyanoacrylates, polyurethane on nylon, and structural acrylic shear data across multiple 3D printed plastics."
+    },
+    "formfutura_bonding_guide_2025": {
+      "title": "Ultimate 3D Prints Bonding Guide | Acetone, Glue, 3D Pens",
+      "authors": "FormFutura",
+      "year": 2025,
+      "url": "https://www.formfutura.com/blog/blogs-1/the-ultimate-3d-prints-bonding-guide-50",
+      "notes": "Broad guide covering acetone bonding for ABS, superglue limits on flexible filaments, hot glue temperature limitations, and UV resin weakness."
+    },
+    "jcrocket_epoxy_bonding_2024": {
+      "title": "Printed Epoxy Bonding",
+      "authors": "jcrocket.com",
+      "year": 2024,
+      "url": "http://jcrocket.com/printed-bonding.shtml",
+      "notes": "Lap shear style comparison of epoxy bonding on PLA, ABS, PETG and PA12 after sanding; useful for relative epoxy performance across materials."
+    },
+    "instructables_pla_glue_test_2020": {
+      "title": "Testing the Best Glue for PLA 3D Printed Parts",
+      "authors": "The Eclectic Workshop",
+      "year": 2020,
+      "url": "https://www.instructables.com/Testing-the-Best-Glue-for-PLA-3D-Printed-Parts/",
+      "notes": "Destructive comparison on PLA showing excellent results for Weld-On 16, CA and contact cement; epoxy and polyurethane improved with coarse sanding and rigid parts."
     }
   },
   "lubricants": {
@@ -4888,7 +6272,7 @@ const DATA = {
         "Water-based lube",
         "PEG lubricant"
       ],
-      "notes": "Aqueous gel based on propylene glycol, polyethylene glycol (PEG), or hydroxyethylcellulose. Virtually no chemical attack on any thermoplastic — primary concern is water content over long-term contact. Washes off easily."
+      "notes": "Aqueous gel based on propylene glycol, polyethylene glycol (PEG), or hydroxyethylcellulose. Virtually no chemical attack on any thermoplastic \u2014 primary concern is water content over long-term contact. Washes off easily."
     },
     "talcum_powder": {
       "name": "Talcum Powder",
@@ -4897,7 +6281,7 @@ const DATA = {
         "Magnesium silicate",
         "Baby powder (talc)"
       ],
-      "notes": "Inert mineral powder (Mg₃Si₄O₁₀(OH)₂). Dry lubricant with no chemical reactivity toward any polymer. Physical abrasion is negligible at part-surface contact pressures. Universally safe."
+      "notes": "Inert mineral powder (Mg\u2083Si\u2084O\u2081\u2080(OH)\u2082). Dry lubricant with no chemical reactivity toward any polymer. Physical abrasion is negligible at part-surface contact pressures. Universally safe."
     },
     "graphite_powder": {
       "name": "Graphite Powder",
@@ -4911,7 +6295,7 @@ const DATA = {
     "moly_powder": {
       "name": "Molybdenum Disulfide Powder",
       "aka": [
-        "MoS₂ powder",
+        "MoS\u2082 powder",
         "Moly powder",
         "Molybdenite"
       ],
@@ -4921,11 +6305,11 @@ const DATA = {
       "name": "Molybdenum Grease",
       "aka": [
         "Moly grease",
-        "MoS₂ grease",
+        "MoS\u2082 grease",
         "Black grease",
         "Molykote"
       ],
-      "notes": "Lithium or mineral oil grease loaded with MoS₂ particles. The carrier grease (usually lithium/mineral oil) determines plastic compatibility. MoS₂ particles are inert. Similar compatibility to lithium grease."
+      "notes": "Lithium or mineral oil grease loaded with MoS\u2082 particles. The carrier grease (usually lithium/mineral oil) determines plastic compatibility. MoS\u2082 particles are inert. Similar compatibility to lithium grease."
     },
     "dielectric_grease": {
       "name": "Dielectric Grease",
@@ -4934,7 +6318,7 @@ const DATA = {
         "Silicone dielectric compound",
         "Permatex dielectric grease"
       ],
-      "notes": "Silicone grease formulated for electrical connector sealing. Almost universally silicone-based (PDMS). Identical plastic compatibility to silicone grease — safe for all common FDM materials."
+      "notes": "Silicone grease formulated for electrical connector sealing. Almost universally silicone-based (PDMS). Identical plastic compatibility to silicone grease \u2014 safe for all common FDM materials."
     },
     "marine_grease": {
       "name": "Marine / Calcium-Barium Grease",
@@ -4944,10 +6328,125 @@ const DATA = {
         "Calcium grease",
         "Trailer bearing grease"
       ],
-      "notes": "Mineral oil thickened with calcium or barium soap. Highly water-resistant. Petroleum hydrocarbon carrier — similar compatibility profile to lithium grease. Minor concern with ABS/HIPS on prolonged contact."
+      "notes": "Mineral oil thickened with calcium or barium soap. Highly water-resistant. Petroleum hydrocarbon carrier \u2014 similar compatibility profile to lithium grease. Minor concern with ABS/HIPS on prolonged contact."
     }
   },
-  "adhesives": {}
+  "adhesives": {
+    "ca_thin": {
+      "name": "Low Viscosity CA Glue",
+      "aka": [
+        "Thin CA",
+        "Super glue",
+        "Cyanoacrylate",
+        "Ethyl cyanoacrylate"
+      ],
+      "notes": "Fast-curing rigid adhesive. Excellent on many rigid printed plastics. Brittle on flexible parts and long-term durability on nylon is limited by moisture cycling."
+    },
+    "ca_gel": {
+      "name": "Gel CA Glue",
+      "aka": [
+        "Thick CA",
+        "Gap-filling CA",
+        "Cyanoacrylate gel"
+      ],
+      "notes": "Slower-setting, gap-filling CA variant. Similar chemistry to thin CA but easier to control and slightly better in imperfect joints."
+    },
+    "eva_hot_melt": {
+      "name": "EVA Hot Melt Glue",
+      "aka": [
+        "Hot glue",
+        "Glue stick",
+        "EVA glue stick"
+      ],
+      "notes": "Standard thermoplastic glue-gun adhesive. Best with high-temp guns; low-temp guns give weaker bonds. Not a true solvent or structural weld."
+    },
+    "pur_hot_melt": {
+      "name": "PUR Hot Melt Adhesive",
+      "aka": [
+        "Polyurethane hot melt",
+        "Reactive PUR hot melt"
+      ],
+      "notes": "Reactive hot melt applied warm then moisture-cures. Typically tougher and more durable than EVA hot melt. Better weathering and creep resistance."
+    },
+    "contact_cement": {
+      "name": "Solvent-Based Contact Cement",
+      "aka": [
+        "Contact adhesive",
+        "Neoprene contact cement"
+      ],
+      "notes": "High initial tack adhesive. Strong on some rigid, compatible plastics with ideal prep. Variable on low-surface-energy engineering plastics."
+    },
+    "adhesive_tape_high_tack": {
+      "name": "High-Tack Adhesive Tape",
+      "aka": [
+        "VHB tape",
+        "Acrylic foam tape",
+        "High-bond tape"
+      ],
+      "notes": "Pressure-sensitive bonding tape. Good for large-area joints, peel damping, and light structural assemblies; not ideal for small, highly stressed joints."
+    },
+    "epoxy_5min": {
+      "name": "5-Minute Epoxy",
+      "aka": [
+        "Quick-set epoxy",
+        "Fast epoxy"
+      ],
+      "notes": "Convenient two-part epoxy with shorter working time and usually lower ultimate toughness than slower-curing epoxy."
+    },
+    "epoxy_30min": {
+      "name": "30-Minute Epoxy",
+      "aka": [
+        "Slow-set epoxy",
+        "Structural epoxy"
+      ],
+      "notes": "Longer-open-time two-part epoxy. Generally stronger and tougher than quick epoxy on printed plastics with proper abrasion."
+    },
+    "uv_resin": {
+      "name": "UV-Curable Resin",
+      "aka": [
+        "UV adhesive",
+        "UV resin glue",
+        "Photopolymer resin"
+      ],
+      "notes": "Convenient for cosmetic seam filling but generally weak for structural joining of printed thermoplastics."
+    },
+    "pva_glue": {
+      "name": "PVA Glue",
+      "aka": [
+        "White glue",
+        "Wood glue",
+        "School glue"
+      ],
+      "notes": "Water-based adhesive with poor structural bonding to most thermoplastics."
+    },
+    "polyurethane_adhesive": {
+      "name": "Polyurethane Adhesive",
+      "aka": [
+        "PU glue",
+        "Moisture-cure polyurethane",
+        "Gorilla Glue type"
+      ],
+      "notes": "Foaming or moisture-cure adhesive with decent toughness and gap filling, but bond quality varies strongly by substrate and cure conditions."
+    },
+    "polyurethane_sealant": {
+      "name": "Polyurethane Sealant",
+      "aka": [
+        "PU sealant",
+        "Sikaflex-type sealant",
+        "Construction sealant"
+      ],
+      "notes": "Flexible, weather-resistant adhesive/sealant. Usually better for dynamic or outdoor joints than for high-stiffness precision assemblies."
+    },
+    "jb_weld": {
+      "name": "JB Weld / Filled Structural Epoxy",
+      "aka": [
+        "Steel-filled epoxy",
+        "JB Weld",
+        "Epoxy putty or filled epoxy"
+      ],
+      "notes": "Heavy-duty epoxy family. Generally good on rigid plastics with prep, but not ideal on low-surface-energy plastics."
+    }
+  }
 };
 
 // ── Derived display order (alphabetical by material name) ─────────────────
@@ -4983,10 +6482,22 @@ const refList = document.getElementById('refList');
 const REF_INDEX = {};
 Object.keys(DATA.references).forEach((slug, i) => { REF_INDEX[slug] = i + 1; });
 
-Object.entries(DATA.references).forEach(([slug, ref], i) => {
+// Filter references for Chemical Resistance
+const chemRefSlugs = new Set();
+Object.values(DATA.materials).forEach(mat => {
+  Object.entries(mat.chemicals || {}).forEach(([ck, entry]) => {
+    const r = entry?.rating;
+    if ((r === 'C' || r === 'D') && entry?.tip) {
+      (entry.references || []).forEach(refSlug => chemRefSlugs.add(refSlug));
+    }
+  });
+});
+
+Object.entries(DATA.references).forEach(([slug, ref]) => {
+  if (!chemRefSlugs.has(slug)) return;
   const li = document.createElement('li');
   li.id = 'ref-' + slug;
-  const num = i + 1;
+  const num = REF_INDEX[slug];
   const link = ref.url
     ? `<a href="${ref.url}" target="_blank" rel="noopener">${esc(ref.title)}</a>`
     : esc(ref.title);
@@ -5037,9 +6548,10 @@ function buildRows(chemOrder) {
         const open = e => {
           e.stopPropagation();
           if (activeCell === td) { hideTip(); return; }
-          hideTip(); activeCell = td; td.classList.add('active');
+          activeCell = td; td.classList.add('active');
+          hideTip();
           const rect = td.getBoundingClientRect();
-          showTip(chem.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2);
+          showTip(chem.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2, 'chemicals');
         };
         td.addEventListener('click', open);
         td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(e); }});
@@ -5146,30 +6658,39 @@ const tipBody  = document.getElementById('tipBody');
 const tipRefs  = document.getElementById('tipRefs');
 let activeCell = null;
 
-function showTip(chemName, matName, rating, entry, x, y) {
+function showTip(chemName, matName, rating, entry, x, y, tabType) {
   tipbox.className = 'tipbox visible r'+rating;
   tipHdr.textContent = chemName + ' — ' + matName;
-  tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% / destroyed)');
+  
+  if (tabType === 'adhesives') {
+    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Weak or unreliable bond':'No practical bond');
+  } else if (tabType === 'lubricants') {
+    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Fails (>5% / destroyed)');
+  } else {
+    tipRating.textContent = 'Rating: '+rating+' — '+(rating==='C'?'Resists poorly (4–5%)':'Does not resist (>5% / destroyed)');
+  }
+  
   tipBody.textContent = entry.tip || '';
 
   // Build clickable, numbered source links
   tipRefs.innerHTML = '';
   const refs = entry.references || [];
   if (refs.length) {
-    const prefix = document.createTextNode('Sources: ');
-    tipRefs.appendChild(prefix);
+    const prefixText = document.createTextNode('Sources: ');
+    tipRefs.appendChild(prefixText);
     refs.forEach((slug, i) => {
       const r = DATA.references[slug];
       const num = REF_INDEX[slug] || '?';
       const label = r ? (r.authors ? r.authors + (r.year ? ' ' + r.year : '') : r.title) : slug;
       const a = document.createElement('a');
       a.textContent = label + ' [' + num + ']';
-      a.href = '#ref-' + slug;
+      const prefix = tabType === 'adhesives' ? 'adhref-' : (tabType === 'lubricants' ? 'lubref-' : 'ref-');
+      a.href = '#' + prefix + slug;
       a.dataset.refSlug = slug;
       a.addEventListener('click', e => {
         e.preventDefault();
         hideTip();
-        highlightRef(slug);
+        highlightRef(slug, prefix);
       });
       tipRefs.appendChild(a);
       if (i < refs.length - 1) tipRefs.appendChild(document.createTextNode('; '));
@@ -5184,8 +6705,8 @@ function showTip(chemName, matName, rating, entry, x, y) {
   tipbox.style.left=tx+'px'; tipbox.style.top=ty+'px';
 }
 
-function highlightRef(slug) {
-  const li = document.getElementById('ref-' + slug);
+function highlightRef(slug, prefix = 'ref-') {
+  const li = document.getElementById(prefix + slug);
   if (!li) return;
   // Scroll into view only if not already visible
   const rect = li.getBoundingClientRect();
@@ -5216,6 +6737,7 @@ tipbox.addEventListener('mouseenter', cancelHide);
 tipbox.addEventListener('mouseleave', scheduledHide);
 
 document.addEventListener('click', e => {
+  if (e.target.closest('td.has-tip')) return;
   if (!tipbox.contains(e.target) && !(activeCell?.contains(e.target))) hideTip();
 });
 document.addEventListener('keydown', e => { if(e.key==='Escape') hideTip(); });
@@ -5347,11 +6869,14 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
     lubHeaderRow.appendChild(th);
   });
 
-  // Reference list — only refs actually used in lubricants data
+  // Reference list — only refs actually linked to in a tooltip on lubricants data
   const lubRefSlugs = new Set();
   Object.values(DATA.materials).forEach(mat => {
-    Object.values(mat.lubricants || {}).forEach(entry => {
-      (entry.references || []).forEach(r => lubRefSlugs.add(r));
+    Object.entries(mat.lubricants || {}).forEach(([lk, entry]) => {
+      const r = entry?.rating;
+      if ((r === 'C' || r === 'D') && entry?.tip) {
+        (entry.references || []).forEach(refSlug => lubRefSlugs.add(refSlug));
+      }
     });
   });
   const lubRefList = document.getElementById('lubRefList');
@@ -5420,9 +6945,10 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
           const open = e => {
             e.stopPropagation();
             if (activeCell === td) { hideTip(); return; }
-            hideTip(); activeCell = td; td.classList.add('active');
+            hideTip();
+            activeCell = td; td.classList.add('active');
             const rect = td.getBoundingClientRect();
-            showTip(lub.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2);
+            showTip(lub.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2, 'lubricants');
           };
           td.addEventListener('click', open);
           td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(e); }});
@@ -5491,6 +7017,174 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
       return lubCurrentSort.dir==='asc' ? ar-br : br-ar;
     });
     buildLubRows(lubSortedKeys);
+  }
+})();
+
+// ── Adhesives tab ─────────────────────────────────────────────────────────
+(function(){
+  const ADH_KEYS = Object.keys(DATA.adhesives);
+  const adhHiddenCols = new Set();
+  let adhSortedKeys = [...ADH_KEYS];
+  let adhCurrentSort = null;
+
+  // Header
+  const adhHeaderRow = document.getElementById('adhHeaderRow');
+  MAT_KEYS.forEach((mk, ci) => {
+    const th = document.createElement('th');
+    th.dataset.ci = 'a'+ci;
+    th.innerHTML = DATA.materials[mk]._meta.name + ' <span class="si"></span>';
+    th.addEventListener('click', () => adhSortByCol(ci));
+    adhHeaderRow.appendChild(th);
+  });
+
+  // Reference list — only refs actually linked to in a tooltip on adhesives data
+  const adhRefSlugs = new Set();
+  Object.values(DATA.materials).forEach(mat => {
+    Object.entries(mat.adhesives || {}).forEach(([ak, entry]) => {
+      const r = entry?.rating;
+      if ((r === 'C' || r === 'D') && entry?.tip) {
+        (entry.references || []).forEach(refSlug => adhRefSlugs.add(refSlug));
+      }
+    });
+  });
+  const adhRefList = document.getElementById('adhRefList');
+  Object.entries(DATA.references).forEach(([slug, ref]) => {
+    if (!adhRefSlugs.has(slug)) return;
+    const li = document.createElement('li');
+    li.id = 'adhref-' + slug;
+    const num = REF_INDEX[slug];
+    const link = ref.url ? `<a href="${ref.url}" target="_blank" rel="noopener">${esc(ref.title)}</a>` : esc(ref.title);
+    const year = ref.year ? ` (${ref.year})` : '';
+    const authors = ref.authors ? ` — ${esc(ref.authors)}` : '';
+    li.innerHTML = `<span class="ref-num">[${num}]</span>` + link + year + authors;
+    adhRefList.appendChild(li);
+  });
+
+  // Column toggles
+  const adhMatToggleRow = document.getElementById('adhMatToggleRow');
+  MAT_KEYS.forEach((mk, ci) => {
+    const btn = document.createElement('button');
+    btn.textContent = DATA.materials[mk]._meta.name;
+    btn.dataset.ci = 'a'+ci;
+    btn.addEventListener('click', () => {
+      if (adhHiddenCols.has(ci)) { adhHiddenCols.delete(ci); btn.classList.remove('hidden-col'); }
+      else { adhHiddenCols.add(ci); btn.classList.add('hidden-col'); }
+      document.querySelectorAll(`#adhTable [data-ci="a${ci}"]`).forEach(el => el.classList.toggle('col-hidden', adhHiddenCols.has(ci)));
+    });
+    adhMatToggleRow.appendChild(btn);
+  });
+  document.getElementById('adhShowAllBtn').addEventListener('click', () => {
+    adhHiddenCols.clear();
+    adhMatToggleRow.querySelectorAll('button').forEach(b => b.classList.remove('hidden-col'));
+    document.querySelectorAll('#adhTable .col-hidden').forEach(el => el.classList.remove('col-hidden'));
+  });
+
+  const adhTbody = document.getElementById('adhTbody');
+
+  function getAdhRating(matKey, adhKey){
+    return DATA.materials[matKey]?.adhesives?.[adhKey] || null;
+  }
+
+  function buildAdhRows(order) {
+    adhTbody.innerHTML = '';
+    order.forEach(ak => {
+      const adh = DATA.adhesives[ak];
+      if (!adh) return;
+      const tr = document.createElement('tr');
+      tr.dataset.ak = ak;
+      const td0 = document.createElement('td');
+      td0.className = 'chem-cell';
+      const aka = (adh.aka || []).join(', ');
+      td0.innerHTML = esc(adh.name) + (aka ? `<span class="fml">${esc(aka)}</span>` : '');
+      if (adh.notes) td0.title = adh.notes;
+      tr.appendChild(td0);
+
+      MAT_KEYS.forEach((mk, ci) => {
+        const entry = getAdhRating(mk, ak);
+        const rating = entry?.rating || null;
+        const td = document.createElement('td');
+        td.className = 'r ' + chipClass(rating);
+        td.dataset.ci = 'a'+ci;
+        if (entry?.confidence) td.dataset.conf = entry.confidence;
+        if (adhHiddenCols.has(ci)) td.classList.add('col-hidden');
+        const hasTip = (rating === 'C' || rating === 'D') && entry?.tip;
+        if (hasTip) {
+          td.classList.add('has-tip'); td.tabIndex = 0; td.setAttribute('role','button');
+          const open = e => {
+            e.stopPropagation();
+            if (activeCell === td) { hideTip(); return; }
+            hideTip();
+            activeCell = td; td.classList.add('active');
+            const rect = td.getBoundingClientRect();
+            showTip(adh.name, DATA.materials[mk]._meta.name, rating, entry, rect.right, rect.top + rect.height/2, 'adhesives');
+          };
+          td.addEventListener('click', open);
+          td.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); open(e); }});
+          td.addEventListener('mouseleave', () => { if(activeCell===td) scheduledHide(); });
+        }
+        const conf = entry?.confidence || null;
+        const dagger = (conf==='measured'||conf==='tds') ? '†' : (conf==='interpolated'||conf==='inferred') ? '‡' : '';
+        const markHtml = dagger ? `<span class="conf-mark">${dagger}</span>` : '';
+        td.innerHTML = `<span class="chip">${chipLabel(rating)}${markHtml}</span>`;
+        tr.appendChild(td);
+      });
+      adhTbody.appendChild(tr);
+    });
+    adhApplyFilters();
+    if (document.getElementById('adhFilterBest').checked) adhMarkBest();
+  }
+
+  buildAdhRows(adhSortedKeys);
+
+  function adhApplyFilters() {
+    const cdOnly = document.getElementById('adhFilterCD').checked;
+    const q = document.getElementById('adhSearchInput').value.trim().toLowerCase();
+    adhTbody.querySelectorAll('tr').forEach(tr => {
+      const ak = tr.dataset.ak;
+      const adh = DATA.adhesives[ak];
+      const name = (adh?.name||'').toLowerCase();
+      const aka  = (adh?.aka||[]).join(' ').toLowerCase();
+      const matchQ = !q || name.includes(q) || aka.includes(q);
+      if (!matchQ) { tr.classList.add('row-hidden'); tr.classList.remove('hl'); return; }
+      if (cdOnly) {
+        const hasCD = MAT_KEYS.some(mk => { const r = getAdhRating(mk,ak)?.rating; return r==='C'||r==='D'; });
+        tr.classList.toggle('row-hidden', !hasCD);
+      } else { tr.classList.remove('row-hidden'); }
+      tr.classList.toggle('hl', !!q);
+    });
+  }
+  document.getElementById('adhFilterCD').addEventListener('change', adhApplyFilters);
+  document.getElementById('adhSearchInput').addEventListener('input', adhApplyFilters);
+  document.getElementById('adhFilterBest').addEventListener('change', () => {
+    document.getElementById('adhFilterBest').checked ? adhMarkBest() : adhClearBest();
+  });
+
+  function adhMarkBest() {
+    adhClearBest();
+    adhTbody.querySelectorAll('tr:not(.row-hidden)').forEach(tr => {
+      const cells = Array.from(tr.querySelectorAll('td.r:not(.col-hidden)'));
+      let best=null, bestRank=99;
+      cells.forEach(td => { const v=td.querySelector('.chip')?.textContent.trim(); const rank=RATING_ORD[v]??99; if(rank<bestRank){bestRank=rank;best=td;} });
+      if(best) best.classList.add('best-col');
+    });
+  }
+  function adhClearBest() { adhTbody.querySelectorAll('.best-col').forEach(td=>td.classList.remove('best-col')); }
+
+  function adhSortByCol(ci) {
+    const ths = Array.from(adhHeaderRow.querySelectorAll('th'));
+    ths.forEach(th => th.classList.remove('sort-asc','sort-desc'));
+    const mk = MAT_KEYS[ci];
+    if (adhCurrentSort?.ci===ci && adhCurrentSort.dir==='asc') {
+      adhCurrentSort={ci,dir:'desc'}; ths[ci+1].classList.add('sort-desc');
+    } else {
+      adhCurrentSort={ci,dir:'asc'}; ths[ci+1].classList.add('sort-asc');
+    }
+    adhSortedKeys = [...ADH_KEYS].sort((a,b) => {
+      const ar = RATING_ORD[getAdhRating(mk,a)?.rating]??99;
+      const br = RATING_ORD[getAdhRating(mk,b)?.rating]??99;
+      return adhCurrentSort.dir==='asc' ? ar-br : br-ar;
+    });
+    buildAdhRows(adhSortedKeys);
   }
 })();
 
